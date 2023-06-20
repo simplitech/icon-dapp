@@ -1,0 +1,6 @@
+transfer 1000 gas genesis owner
+transfer 50 gas genesis user
+
+contract deploy ../smart_contracts/icon_dapp/child.nef owner
+contract deploy ../smart_contracts/icon_dapp/parent.nef owner
+contract deploy ../smart_contracts/icon_dapp/ownership.nef user

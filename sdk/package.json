@@ -1,0 +1,53 @@
+{
+  "name": "@simplitech/icon-dapp",
+  "version": "1.0.0",
+  "description": "The Icon DApp SDK lets you get icons from smart contracts on the Neo blockchain.",
+  "main": "dist/index",
+  "types": "dist/index",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplitech/icon-dapp.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-mocha tests/**/*.spec.ts",
+    "sc-deploy": "node  --experimental-specifier-resolution=node scripts/deploy.js",
+    "sc-metadata": "node --experimental-specifier-resolution=node scripts/set_icons.js"
+  },
+  "keywords": [],
+  "author": "Simpli",
+  "email": "contact@simplitech.io",
+  "url": "https://simplitech.io/",
+  "license": "MIT",
+  "dependencies": {
+    "@cityofzion/neon-core": "5.2.0",
+    "@cityofzion/neon-invoker": "1.1.0",
+    "@cityofzion/neo3-invoker": "1.0.4",
+    "@cityofzion/neon-parser": "1.5.2",
+    "@cityofzion/neo3-parser": "1.5.2",
+    "@types/lodash": "^4.14.176",
+    "@types/node": "^16.11.11",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^9.1.1",
+    "assert": "^2.0.0",
+    "chai": "^4.3.6",
+    "cross-env": "^7.0.3",
+    "esm": "^3.2.25",
+    "fs": "0.0.1-security",
+    "mocha": "^10.0.0",
+    "prettier": "^2.4.1",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.22.10",
+    "typescript": "^4.4.4 <4.8",
+    "typings": "^2.1.1"
+  }
+}
