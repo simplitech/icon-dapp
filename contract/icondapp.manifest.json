@@ -5,176 +5,206 @@
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 2482,
+                "offset": 1988,
                 "parameters": [
                     {
-                        "name": "data",
-                        "type": "Any"
+                        "type": "Any",
+                        "name": "data"
                     },
                     {
-                        "name": "update",
-                        "type": "Boolean"
+                        "type": "Boolean",
+                        "name": "update"
                     }
                 ],
-                "returntype": "Void",
-                "safe": false
+                "safe": false,
+                "returntype": "Void"
             },
             {
                 "name": "update",
                 "offset": 0,
                 "parameters": [
                     {
-                        "name": "nef_file",
-                        "type": "ByteArray"
+                        "type": "ByteArray",
+                        "name": "nef_file"
                     },
                     {
-                        "name": "manifest",
-                        "type": "ByteArray"
+                        "type": "ByteArray",
+                        "name": "manifest"
                     }
                 ],
-                "returntype": "Void",
-                "safe": false
+                "safe": false,
+                "returntype": "Void"
             },
             {
                 "name": "name",
-                "offset": 77,
+                "offset": 39,
                 "parameters": [],
-                "returntype": "String",
-                "safe": false
+                "safe": false,
+                "returntype": "String"
             },
             {
                 "name": "getOwner",
-                "offset": 89,
+                "offset": 51,
                 "parameters": [],
-                "returntype": "Hash160",
-                "safe": true
+                "safe": true,
+                "returntype": "Hash160"
             },
             {
                 "name": "addProperty",
-                "offset": 169,
+                "offset": 129,
                 "parameters": [
                     {
-                        "name": "property_name",
-                        "type": "String"
+                        "type": "String",
+                        "name": "property_name"
                     },
                     {
-                        "name": "description",
-                        "type": "String"
+                        "type": "String",
+                        "name": "description"
                     }
                 ],
-                "returntype": "Boolean",
-                "safe": false
+                "safe": false,
+                "returntype": "Boolean"
             },
             {
                 "name": "updateProperty",
-                "offset": 502,
+                "offset": 371,
                 "parameters": [
                     {
-                        "name": "property_name",
-                        "type": "String"
+                        "type": "String",
+                        "name": "property_name"
                     },
                     {
-                        "name": "description",
-                        "type": "String"
+                        "type": "String",
+                        "name": "description"
                     }
                 ],
-                "returntype": "Boolean",
-                "safe": false
+                "safe": false,
+                "returntype": "Boolean"
             },
             {
                 "name": "getProperties",
-                "offset": 832,
+                "offset": 615,
                 "parameters": [],
+                "safe": true,
                 "returntype": "Map",
-                "safe": true
+                "returngenerickey": {
+                    "type": "Any"
+                },
+                "returngenericitem": {
+                    "type": "Any"
+                }
             },
             {
                 "name": "setMetaData",
-                "offset": 923,
+                "offset": 662,
                 "parameters": [
                     {
-                        "name": "script_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "script_hash"
                     },
                     {
-                        "name": "property_name",
-                        "type": "String"
+                        "type": "String",
+                        "name": "property_name"
                     },
                     {
-                        "name": "value",
-                        "type": "String"
+                        "type": "String",
+                        "name": "value"
                     }
                 ],
-                "returntype": "Boolean",
-                "safe": false
+                "safe": false,
+                "returntype": "Boolean"
             },
             {
                 "name": "getMetaData",
-                "offset": 1226,
+                "offset": 923,
                 "parameters": [
                     {
-                        "name": "script_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "script_hash"
                     }
                 ],
+                "safe": true,
                 "returntype": "Map",
-                "safe": true
+                "returngenerickey": {
+                    "type": "Any"
+                },
+                "returngenericitem": {
+                    "type": "Any"
+                }
             },
             {
                 "name": "getMultipleMetaData",
-                "offset": 1379,
+                "offset": 1032,
                 "parameters": [
                     {
-                        "name": "contract_hashes",
-                        "type": "Array"
+                        "type": "Array",
+                        "generic": {
+                            "type": "Hash160"
+                        },
+                        "name": "contract_hashes"
                     }
                 ],
+                "safe": true,
                 "returntype": "Map",
-                "safe": true
+                "returngenerickey": {
+                    "type": "Any"
+                },
+                "returngenericitem": {
+                    "type": "Any"
+                }
             },
             {
                 "name": "setContractParent",
-                "offset": 1423,
+                "offset": 1076,
                 "parameters": [
                     {
-                        "name": "child_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "child_hash"
                     },
                     {
-                        "name": "parent_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "parent_hash"
                     }
                 ],
-                "returntype": "Boolean",
-                "safe": false
+                "safe": false,
+                "returntype": "Boolean"
             },
             {
                 "name": "getContractParent",
-                "offset": 1687,
+                "offset": 1338,
                 "parameters": [
                     {
-                        "name": "child_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "child_hash"
                     }
                 ],
-                "returntype": "Any",
-                "safe": true
+                "safe": true,
+                "returntype": "Hash160",
+                "returnnullable": true
             },
             {
                 "name": "setOwnership",
-                "offset": 1877,
+                "offset": 1524,
                 "parameters": [
                     {
-                        "name": "script_hash",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "script_hash"
                     },
                     {
-                        "name": "contract_owner",
-                        "type": "Hash160"
+                        "type": "Hash160",
+                        "name": "contract_owner"
                     }
                 ],
-                "returntype": "Boolean",
-                "safe": false
+                "safe": false,
+                "returntype": "Boolean"
+            },
+            {
+                "name": "listIcons",
+                "offset": 1925,
+                "parameters": [],
+                "safe": true,
+                "returntype": "InteropInterface",
+                "returnhint": "Iterator"
             }
         ],
         "events": []
@@ -184,7 +214,22 @@
             "contract": "0xfffdc93764dbaddd97c48f252a53ea4643faa3fd",
             "methods": [
                 "update",
-                "destroy"
+                "destroy",
+                "getContract"
+            ]
+        },
+        {
+            "contract": "0xacce6fd80d44e1796aa0c2c625e9e4e0ce39efc0",
+            "methods": [
+                "deserialize",
+                "serialize"
+            ]
+        },
+        {
+            "contract": "0x726cb6e0cd8628a1350a611384688911ab75f51b",
+            "methods": [
+                "sha256",
+                "ripemd160"
             ]
         }
     ],
