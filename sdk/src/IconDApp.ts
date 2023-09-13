@@ -1,5 +1,5 @@
-import { IconProperties, SmartContractConfig } from './types'
-import { ContractInvocation, ContractInvocationMulti } from '@cityofzion/neo3-invoker'
+import { IconProperties, SmartContractConfig, ScriptHashAndIcons } from './types'
+import { ContractInvocation, ContractInvocationMulti, Neo3Invoker, StackItemJson } from '@cityofzion/neo3-invoker'
 import { Neo3Parser } from '@cityofzion/neo3-parser'
 
 
@@ -294,6 +294,32 @@ export class IconDApp {
     })
   }
 
+  async* listIcons(): AsyncGenerator<ScriptHashAndIcons, void>{
+    const res = await this.config.invoker.testInvoke({
+      invocations: [
+        IconDApp.buildListIconsInvocation(this.config.scriptHash)
+      ],
+      signers: [],
+    })
+
+    if (res.stack.length !== 0 && res.session !== undefined && res.stack[0].id !== undefined) {
+
+      let iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, 1)
+
+      while (iterator.length !== 0){
+        const iteratorValue = iterator[0].value as StackItemJson[]
+        const scriptHash: string = this.config.parser.parseRpcResponse(iteratorValue[0], {ByteStringToScriptHash: true})
+        const icons: IconProperties & Record<string, any> = this.config.parser.parseRpcResponse(iteratorValue[1])
+
+        yield { scriptHash, icons }
+        iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, 1)
+      }
+    }
+    else {
+      throw new Error(res.exception ?? 'unrecognized response')
+    }
+  }
+
   async invokeFunction(cim: ContractInvocationMulti): Promise<string>{
     return await this.config.invoker.invokeFunction(cim)
   }
@@ -422,4 +448,11 @@ export class IconDApp {
     }
   }
   
+  static buildListIconsInvocation(scriptHash: string): ContractInvocation{
+    return {
+      scriptHash,
+      operation: 'listIcons',
+      args: [],
+    }
+  }
 }

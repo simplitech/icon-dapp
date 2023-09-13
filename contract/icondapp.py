@@ -1,14 +1,15 @@
 from typing import Any, List, Optional
 
-from boa3.builtin import NeoMetadata, metadata, public
+from boa3.builtin.compile_time import NeoMetadata, metadata, public
 from boa3.builtin.interop import runtime, storage
 from boa3.builtin.interop.blockchain import Transaction
 from boa3.builtin.interop.contract import Contract
 from boa3.builtin.interop.contract.contractmanifest import ContractManifest
+from boa3.builtin.interop.iterator import Iterator
 from boa3.builtin.nativecontract.contractmanagement import ContractManagement
 from boa3.builtin.nativecontract.cryptolib import CryptoLib
 from boa3.builtin.nativecontract.stdlib import StdLib
-from boa3.builtin.type import ByteString, UInt160
+from boa3.builtin.type import UInt160, helper
 
 
 # -------------------------------------------
@@ -292,16 +293,16 @@ def _compute_contract_hash(sender: UInt160, contract: Contract) -> bytes:
 
     # there's a bug with calling contract.manifest.name directly
     manifest: ContractManifest = contract.manifest
-    contract_name = manifest.name.to_bytes()
+    contract_name = helper.to_bytes(manifest.name)
 
     contract_name_size = len(contract_name)
     if contract_name_size < 0x100:
-        serialized_name = b'\x0c' + contract_name_size.to_bytes()   # PUSHDATA1
+        serialized_name = b'\x0c' + helper.to_bytes(contract_name_size)   # PUSHDATA1
     elif contract_name_size < 0x10000:
-        serialized_name = b'\x0d' + contract_name_size.to_bytes()   # PUSHDATA2
+        serialized_name = b'\x0d' + helper.to_bytes(contract_name_size)   # PUSHDATA2
     else:
         serialized_name = b'\x0e' + \
-            contract_name_size.to_bytes()[:4]  # PUSHDATA4
+            helper.to_bytes(contract_name_size)[:4]  # PUSHDATA4
 
     validation_script = (b'\x38' +                      # ABORT
                          b'\x0c\x14' + sender +         # PUSHDATA1 + 20 bytes
@@ -311,22 +312,28 @@ def _compute_contract_hash(sender: UInt160, contract: Contract) -> bytes:
     return CryptoLib.ripemd160(CryptoLib.sha256(validation_script))
 
 
+@public(name="listIcons", safe=True)
+def list_icons() -> Iterator:
+    find_option = storage.FindOptions.REMOVE_PREFIX | storage.FindOptions.DESERIALIZE_VALUES
+    return storage.find(b"\x03", options=find_option)
+
+
 # Keys
-def get_owner_key() -> ByteString:
+def get_owner_key() -> bytes:
     return b"\x01"
 
 
-def get_properties_key() -> ByteString:
+def get_properties_key() -> bytes:
     return b"\x02"
 
 
-def get_contract_property_key(script_hash: UInt160) -> ByteString:
+def get_contract_property_key(script_hash: UInt160) -> bytes:
     return b"\x03" + script_hash
 
 
-def get_child_key(child_hash: UInt160) -> ByteString:
+def get_child_key(child_hash: UInt160) -> bytes:
     return b"\x04" + child_hash
 
 
-def get_contract_owner_key(script_hash: UInt160) -> ByteString:
+def get_contract_owner_key(script_hash: UInt160) -> bytes:
     return b"\x05" + script_hash
