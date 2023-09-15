@@ -22,10 +22,11 @@ def manifest_metadata() -> NeoMetadata:
     Defines this smart contract's metadata information
     """
     meta = NeoMetadata()
-    meta.description = "Smart Contract icon management prop. Made by meevee98, lock9, luc10921."
-    meta.name = "Icon DApp"
+    meta.description = "Smart Contract icon management prop. Made by meevee98, lock9, luc10921. Visit icondapp.io to discover more of the ecosystem."
+    meta.name = "IconDapp"
     meta.author = "Simpli"
     meta.email = "contact@simplitech.io"
+    meta.source = "https://github.com/simplitech/icon-dapp"
     meta.supported_standards = []
     # requires access to ContractManagement methods
     meta.add_permission(contract='0xfffdc93764dbaddd97c48f252a53ea4643faa3fd',
@@ -55,7 +56,7 @@ def update(nef_file: bytes, manifest: bytes):
 
 @public
 def name() -> str:
-    return "Icon DApp"
+    return "IconDapp"
 
 
 @public(name="getOwner", safe=True)

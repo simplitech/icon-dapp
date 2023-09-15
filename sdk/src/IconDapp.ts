@@ -3,7 +3,7 @@ import { ContractInvocation, ContractInvocationMulti, Neo3Invoker, StackItemJson
 import { Neo3Parser } from '@cityofzion/neo3-parser'
 
 
-export class IconDApp {
+export class IconDapp {
 
   static MAINNET = '0x489e98351485bbd85be99618285932172f1862e4'
   static TESTNET = ''
@@ -18,7 +18,7 @@ export class IconDApp {
   async getOwner(): Promise<string> {
     const res = await this.config.invoker.testInvoke( {
       invocations: [
-        IconDApp.buildGetOwnerInvocation(this.config.scriptHash)
+        IconDapp.buildGetOwnerInvocation(this.config.scriptHash)
       ],
       signers: [],
     })
@@ -36,7 +36,7 @@ export class IconDApp {
   async getName(): Promise<string> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildNameInvocation(this.config.scriptHash)
+        IconDapp.buildNameInvocation(this.config.scriptHash)
       ],
       signers: [],
     })
@@ -54,7 +54,7 @@ export class IconDApp {
   async testAddProperty(options: {propertyName: string, description: string}): Promise<boolean> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildAddPropertyInvocation(
+        IconDapp.buildAddPropertyInvocation(
           this.config.scriptHash,
           this.config.parser,
           {propertyName: options.propertyName, description: options.description}
@@ -76,7 +76,7 @@ export class IconDApp {
   async addProperty(options: {propertyName: string, description: string}): Promise<string> {
     return await this.config.invoker.invokeFunction({
       invocations: [
-        IconDApp.buildAddPropertyInvocation(
+        IconDapp.buildAddPropertyInvocation(
           this.config.scriptHash,
           this.config.parser,
           {propertyName: options.propertyName, description: options.description}
@@ -92,7 +92,7 @@ export class IconDApp {
   async testUpdateProperty(options: {propertyName: string, description: string}): Promise<boolean> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildUpdatePropertyInvocation(
+        IconDapp.buildUpdatePropertyInvocation(
           this.config.scriptHash,
           this.config.parser,
           {propertyName: options.propertyName, description: options.description}
@@ -114,7 +114,7 @@ export class IconDApp {
   async updateProperty(options: {propertyName: string, description: string}): Promise<string> {
     return await this.config.invoker.invokeFunction({
       invocations: [
-        IconDApp.buildUpdatePropertyInvocation(
+        IconDapp.buildUpdatePropertyInvocation(
           this.config.scriptHash,
           this.config.parser,
           {propertyName: options.propertyName, description: options.description}
@@ -130,7 +130,7 @@ export class IconDApp {
   async getProperties(): Promise<IconProperties & Record<string, any>> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildGetPropertiesInvocation(this.config.scriptHash)
+        IconDapp.buildGetPropertiesInvocation(this.config.scriptHash)
       ],
       signers: [],
     })
@@ -148,7 +148,7 @@ export class IconDApp {
   async testSetMetaData(options: {scriptHash: string, propertyName: string, value: string}): Promise<boolean> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildSetMetaDataInvocation(
+        IconDapp.buildSetMetaDataInvocation(
           this.config.scriptHash,
           this.config.parser,
           {scriptHash: options.scriptHash, propertyName: options.propertyName, value: options.value}
@@ -170,7 +170,7 @@ export class IconDApp {
   async setMetaData(options: {scriptHash: string, propertyName: string, value: string}): Promise<string> {
     return await this.config.invoker.invokeFunction({
       invocations: [
-        IconDApp.buildSetMetaDataInvocation(
+        IconDapp.buildSetMetaDataInvocation(
           this.config.scriptHash,
           this.config.parser,
           {scriptHash: options.scriptHash, propertyName: options.propertyName, value: options.value}
@@ -186,7 +186,7 @@ export class IconDApp {
   async getMetaData(options: {scriptHash: string}): Promise<IconProperties & Record<string, any>> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildGetMetaDataInvocation(this.config.scriptHash, {scriptHash: options.scriptHash})
+        IconDapp.buildGetMetaDataInvocation(this.config.scriptHash, {scriptHash: options.scriptHash})
       ],
       signers: [],
     })
@@ -204,7 +204,7 @@ export class IconDApp {
   async getMultipleMetaData(options: { contractHashes: string[] }): Promise<Map<string, Map<string, string>>[]> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildGetMultipleMetaDataInvocation(this.config.scriptHash, {contractHashes: options.contractHashes})
+        IconDapp.buildGetMultipleMetaDataInvocation(this.config.scriptHash, {contractHashes: options.contractHashes})
       ],
       signers: [],
     })
@@ -222,7 +222,7 @@ export class IconDApp {
   async testSetContractParent(options: { childHash: string, parentHash: string }): Promise<boolean> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
+        IconDapp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
       ],
       signers: [],
     })
@@ -240,7 +240,7 @@ export class IconDApp {
   async setContractParent(options: { childHash: string, parentHash: string }): Promise<string> {
     return await this.config.invoker.invokeFunction({
       invocations: [
-        IconDApp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
+        IconDapp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
       ],
       signers: [],
     })
@@ -252,7 +252,7 @@ export class IconDApp {
   async getContractParent(options: { childHash: string }): Promise<string> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildGetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash})
+        IconDapp.buildGetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash})
       ],
       signers: [],
     })
@@ -270,7 +270,7 @@ export class IconDApp {
   async testSetOwnership(options: { scriptHash: string, sender: string }): Promise<boolean> {
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
+        IconDapp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
       ],
       signers: [],
     })
@@ -288,7 +288,7 @@ export class IconDApp {
   async setOwnership(options: { scriptHash: string, sender: string }): Promise<string> {
     return await this.config.invoker.invokeFunction({
       invocations: [
-        IconDApp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
+        IconDapp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
       ],
       signers: [],
     })
@@ -297,7 +297,7 @@ export class IconDApp {
   async* listIcons(): AsyncGenerator<ScriptHashAndIcons, void>{
     const res = await this.config.invoker.testInvoke({
       invocations: [
-        IconDApp.buildListIconsInvocation(this.config.scriptHash)
+        IconDapp.buildListIconsInvocation(this.config.scriptHash)
       ],
       signers: [],
     })

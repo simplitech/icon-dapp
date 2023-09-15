@@ -1,11 +1,11 @@
 {
-    "name": "Icon DApp",
+    "name": "IconDapp",
     "groups": [],
     "abi": {
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 1988,
+                "offset": 1987,
                 "parameters": [
                     {
                         "type": "Any",
@@ -44,14 +44,14 @@
             },
             {
                 "name": "getOwner",
-                "offset": 51,
+                "offset": 50,
                 "parameters": [],
                 "safe": true,
                 "returntype": "Hash160"
             },
             {
                 "name": "addProperty",
-                "offset": 129,
+                "offset": 128,
                 "parameters": [
                     {
                         "type": "String",
@@ -67,7 +67,7 @@
             },
             {
                 "name": "updateProperty",
-                "offset": 371,
+                "offset": 370,
                 "parameters": [
                     {
                         "type": "String",
@@ -83,7 +83,7 @@
             },
             {
                 "name": "getProperties",
-                "offset": 615,
+                "offset": 614,
                 "parameters": [],
                 "safe": true,
                 "returntype": "Map",
@@ -96,7 +96,7 @@
             },
             {
                 "name": "setMetaData",
-                "offset": 662,
+                "offset": 661,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -116,7 +116,7 @@
             },
             {
                 "name": "getMetaData",
-                "offset": 923,
+                "offset": 922,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -134,7 +134,7 @@
             },
             {
                 "name": "getMultipleMetaData",
-                "offset": 1032,
+                "offset": 1031,
                 "parameters": [
                     {
                         "type": "Array",
@@ -155,7 +155,7 @@
             },
             {
                 "name": "setContractParent",
-                "offset": 1076,
+                "offset": 1075,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -171,7 +171,7 @@
             },
             {
                 "name": "getContractParent",
-                "offset": 1338,
+                "offset": 1337,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -184,7 +184,7 @@
             },
             {
                 "name": "setOwnership",
-                "offset": 1524,
+                "offset": 1523,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -200,7 +200,7 @@
             },
             {
                 "name": "listIcons",
-                "offset": 1925,
+                "offset": 1924,
                 "parameters": [],
                 "safe": true,
                 "returntype": "InteropInterface",
@@ -237,7 +237,7 @@
     "features": {},
     "supportedstandards": [],
     "extra": {
-        "Description": "Smart Contract icon management prop. Made by meevee98, lock9, luc10921.",
+        "Description": "Smart Contract icon management prop. Made by meevee98, lock9, luc10921. Visit icondapp.io to discover more of the ecosystem.",
         "Author": "Simpli",
         "Email": "contact@simplitech.io"
     }

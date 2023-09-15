@@ -1,8 +1,8 @@
 import * as sdk from '../dist'
 import fs from 'fs'
-import {wallet} from '@cityofzion/neon-core'
-import {exec as _exec} from 'child_process'
-import {txDidComplete, sleep} from './helpers'
+import { wallet } from '@cityofzion/neon-core'
+import { exec as _exec } from 'child_process'
+import { txDidComplete, sleep } from './helpers'
 import { NeonParser } from '@cityofzion/neon-parser'
 import { NeonInvoker } from '@cityofzion/neon-invoker'
 import * as util from 'util'
@@ -12,11 +12,11 @@ async function main(network, signer, timeConstant) {
     let result
     const exec = util.promisify(_exec)
 
-    let stdout = (await exec('neoxp contract get -i ../default.neo-express "Icon DApp"')).stdout
+    let stdout = (await exec('neoxp contract get -i ../default.neo-express "IconDapp"')).stdout
     let neoxpContract = JSON.parse(stdout)[0]
     const scriptHash = neoxpContract.hash
 
-    const iconDapp = new sdk.IconDApp({
+    const iconDapp = new sdk.IconDapp({
         scriptHash,
         invoker: await NeonInvoker.init(network, signer),
         parser: NeonParser,
@@ -26,7 +26,7 @@ async function main(network, signer, timeConstant) {
     const invocations = []
 
     // Adding the properties
-    invocations.push(sdk.IconDApp.buildAddPropertyInvocation(
+    invocations.push(sdk.IconDapp.buildAddPropertyInvocation(
         scriptHash,
         NeonParser,
         {
@@ -34,7 +34,7 @@ async function main(network, signer, timeConstant) {
             description: "Icon with a 25x25 pixels resolution"
         }
     ))
-    invocations.push(sdk.IconDApp.buildAddPropertyInvocation(
+    invocations.push(sdk.IconDapp.buildAddPropertyInvocation(
         scriptHash,
         NeonParser,
         {
@@ -44,7 +44,7 @@ async function main(network, signer, timeConstant) {
     ))
 
     // Set NEO 25x25 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -54,7 +54,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
     // Set NEO 288x288 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -63,9 +63,9 @@ async function main(network, signer, timeConstant) {
             value: 'https://icon-dapp.s3.amazonaws.com/288x288/Neo.png',
         }
     ))
-        
+
     // Set GAS 25x25 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -75,7 +75,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
     // Set GAS 288x288 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -84,9 +84,9 @@ async function main(network, signer, timeConstant) {
             value: 'https://icon-dapp.s3.amazonaws.com/288x288/GAS.png',
         }
     ))
-    
+
     // Set FLM 25x25 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -96,7 +96,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
     // Set FLM 288x288 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -107,7 +107,7 @@ async function main(network, signer, timeConstant) {
     ))
 
     // Set Burger 25x25 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -117,7 +117,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
     // Set Burger 288x288 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -128,7 +128,7 @@ async function main(network, signer, timeConstant) {
     ))
 
     // Set GrantSharesGov 25x25 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -138,7 +138,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
     // Set GrantSharesGov 288x288 icon
-    invocations.push(sdk.IconDApp.buildSetMetaDataInvocation(
+    invocations.push(sdk.IconDapp.buildSetMetaDataInvocation(
         scriptHash,
         NeonParser,
         {
@@ -149,7 +149,7 @@ async function main(network, signer, timeConstant) {
     ))
 
     // Set GrantSharesTreasury as child of GrantSharesGov
-    invocations.push(sdk.IconDApp.buildSetContractParentInvocation(
+    invocations.push(sdk.IconDapp.buildSetContractParentInvocation(
         scriptHash,
         {
             childHash: '0x6276c1e3a68280bc6c9c00df755fb691be1162ef',
@@ -157,7 +157,7 @@ async function main(network, signer, timeConstant) {
         }
     ))
 
-    const txid = await iconDapp.invokeFunction({invocations, signers: []})
+    const txid = await iconDapp.invokeFunction({ invocations, signers: [] })
 
     console.log(`Setting metadata transaction ID: ${txid}`)
 
