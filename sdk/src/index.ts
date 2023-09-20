@@ -1,2 +1,2 @@
 export * from './types'
-export * from './IconDApp'
+export * from './IconDapp'

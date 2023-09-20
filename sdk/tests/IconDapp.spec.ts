@@ -1,14 +1,14 @@
 import Neon from '@cityofzion/neon-core'
 import fs from 'fs'
 import assert from 'assert'
-import {IconDApp} from '../src'
+import {IconDapp} from '../src'
 import {exec as _exec, spawn} from 'child_process'
 import {afterEach} from 'mocha'
 import * as util from 'util'
 import { NeonInvoker } from '@cityofzion/neon-invoker'
 import { NeonParser } from '@cityofzion/neon-parser'
 
-describe('Basic IconDApp Test Suite', function () {
+describe('Basic IconDapp Test Suite', function () {
   this.timeout(60000)
   let scriptHash: string
   let wallets: any
@@ -18,7 +18,7 @@ describe('Basic IconDApp Test Suite', function () {
   const wait = util.promisify(setTimeout)
 
   const getSdk = async (account?: any) => {
-    return new IconDApp({
+    return new IconDapp({
       scriptHash,
       invoker: await NeonInvoker.init('http://127.0.0.1:50012', account),
       parser: NeonParser,
@@ -29,7 +29,7 @@ describe('Basic IconDApp Test Suite', function () {
     await exec('neoxp checkpoint restore -i ../default.neo-express -f ../postSetup.neoxp-checkpoint')
 
     await exec('neoxp batch -i ../../../default.neo-express ./tests/batch_files/initialize.batch')
-    const {stdout} = await exec('neoxp contract get "Icon DApp" -i ../default.neo-express')
+    const {stdout} = await exec('neoxp contract get "IconDapp" -i ../default.neo-express')
 
     const neoxpContract = JSON.parse(stdout)[0]
     scriptHash = neoxpContract.hash
@@ -54,7 +54,7 @@ describe('Basic IconDApp Test Suite', function () {
     const iconDapp = await getSdk()
 
     const resp = await iconDapp.getName()
-    assert.equal(resp, 'Icon DApp')
+    assert.equal(resp, 'IconDapp')
   })
 
   it('Tests getOwner before being set', async () => {

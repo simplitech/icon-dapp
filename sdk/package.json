@@ -1,7 +1,7 @@
 {
   "name": "@simplitech/icon-dapp",
   "version": "1.0.0",
-  "description": "The Icon DApp SDK lets you get icons from smart contracts on the Neo blockchain.",
+  "description": "The IconDapp SDK lets you get icons from smart contracts on the Neo blockchain.",
   "main": "dist/index",
   "types": "dist/index",
   "type": "module",
