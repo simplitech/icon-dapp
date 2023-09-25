@@ -1,7 +1,7 @@
 # IconDapp
 
 ## Install the SDK
-Install the IconDapp, NeonInvoker, and NeonParser NeonDappkit packages with your desired package manager:
+Install the IconDapp, NeonInvoker, and NeonParser packages:
 ```bash
 npm i @simplitech/icon-dapp @cityofzion/neon-invoker@1.3.1 @cityofzion/neon-parser@1.5.2
 ```
@@ -15,7 +15,7 @@ import { NeonParser } from '@cityofzion/neon-parser'
 
 
 const createIconDapp = async (account?: any) => { 
-  new IconDapp({
+  return new IconDapp({
     scriptHash: IconDapp.MAINNET,
     invoker: await NeonInvoker.init('http://seed1.neo.org:10332', account),
     parser: NeonParser,
@@ -33,9 +33,10 @@ Returns an object with pairs of the name of the property and a description of th
 const callGetProperties = async () => {
   const iconDapp = await createIconDapp()
   const props = await iconDapp.getProperties()
-  console.log(JSON.stringify(props, null, 2))
+  console.log(props)
 }
 ```
+Result:
 ```bash
 {
   'icon/25x25': 'Icon with a 25x25 pixels resolution',
@@ -49,12 +50,13 @@ Returns an object with the metadata about the icons of a smart contract. If the 
 const callGetMetaData = async () => {
   const iconDapp = await createIconDapp()
   // Getting the icons of the GAS contract
-  const resp = await iconDapp.getMetaData({
+  const gasIcons = await iconDapp.getMetaData({
     scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf"
   })
-  console.log(JSON.stringify(resp, null, 2))
+  console.log(gasIcons)
 }
 ```
+Result:
 ```bash
 {
   'icon/25x25': 'https://icon-dapp.s3.amazonaws.com/25x25/GAS.png',
@@ -67,15 +69,16 @@ Returns an object with the metadata about the icons of multiple smart contracts.
 ```typescript	
 const callGetMultipleMetaData = async () => {
   const iconDapp = await createIconDapp()
-  const resp = await iconDapp.getMultipleMetaData({
+  const neoBlockchainTokensIcons = await iconDapp.getMultipleMetaData({
     contractHashes: [
       "0xd2a4cff31913016155e38e474a2c06d08be276cf",
       "0xef4073a0f2b305a38ec4050e4d3d28bc40ea63f5"
     ]
   })
-  console.log(JSON.stringify(resp, null, 2))
+  console.log(neoBlockchainTokensIcons)
 }
 ```
+Result:
 ```bash
 {
   '0xd2a4cff31913016155e38e474a2c06d08be276cf': {
@@ -90,7 +93,7 @@ const callGetMultipleMetaData = async () => {
 ```
 
 ### `getContractParent(options: { childHash: string })`
-Returns the parent of a smart contract. If there is no parent it will return null.
+A Dapp is often composed of multiple SmartContracts, so in IconDapp, we group them using the keyword "parent." In short, a Dapp has a single "parent" SmartContract for multiple children. If you require information about a SmartContract's parent, you can utilize the getContractParent method. It's important to note that this method is unnecessary for retrieving an icon associated with a child scripthash; you can still utilize getMetaData for this purpose.
 ```typescript
 const callGetContractParent = async () => {
   const iconDapp = await createIconDapp()
@@ -98,9 +101,10 @@ const callGetContractParent = async () => {
     // Getting the parent of this contract
     childHash: "0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9"
   })
-  console.log(JSON.stringify(resp, null, 2))
+  console.log(resp)
 }
 ```
+Result:
 ```bash
 0x6276c1e3a68280bc6c9c00df755fb691be1162ef
 ```
@@ -112,12 +116,13 @@ const callListIcons = async () => {
   const iconDapp = await createIconDapp()
   const icons: { scriptHash: string, icons: object }[] = []
 
-  for await (const icon of iconDapp.listIcons()) {
-    icons.push(icon)
+  for await (const iconsPage of iconDapp.listIcons()) {
+    icons.push(...iconsPage)
   }
   console.log(icons)
 }
 ```
+Result:
 ```bash
 [
   {
