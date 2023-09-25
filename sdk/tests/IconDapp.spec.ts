@@ -463,8 +463,8 @@ describe('Basic IconDapp Test Suite', function () {
     const iconDapp = await getSdk(owner.account)
     
     let icons: { scriptHash: string, icons: object }[] = [] 
-    for await (const icon of await iconDapp.listIcons()) {
-      icons.push(icon)
+    for await (const iconsPage of iconDapp.listIcons()) {
+      icons.push(...iconsPage)
     }
     
     // 5 smart contracts had their icons added with the set_icons.js setup script (NEO, GAS, FLM, BurgerNEO, GrantSharesGov)
@@ -484,9 +484,10 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     icons = []
-    for await (const icon of await iconDapp.listIcons()) {
-      icons.push(icon)
+    for await (const iconsPage of iconDapp.listIcons()) {
+      icons.push(...iconsPage)
     }
+
     assert.strictEqual(icons.length, 6)
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0x1234567890123456789012345678901234567890"), true)
   })
