@@ -491,4 +491,39 @@ describe('Basic IconDapp Test Suite', function () {
     assert.strictEqual(icons.length, 6)
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0x1234567890123456789012345678901234567890"), true)
   })
+
+  it('Tests listIcons with itemsPerRequest argument', async () => {
+    const owner = wallets.find((wallet: any) => wallet.name === 'owner')
+    const iconDapp = await getSdk(owner.account)
+    
+    let icons: { scriptHash: string, icons: object }[] = [] 
+    for await (const iconsPage of iconDapp.listIcons(2)) {
+      icons.push(...iconsPage)
+    }
+
+    // 5 smart contracts had their icons added with the set_icons.js setup script (NEO, GAS, FLM, BurgerNEO, GrantSharesGov)
+    assert.strictEqual(icons.length, 5)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0xef4073a0f2b305a38ec4050e4d3d28bc40ea63f5"), true)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0xd2a4cff31913016155e38e474a2c06d08be276cf"), true)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0xf0151f528127558851b39c2cd8aa47da7418ab28"), true)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0x48c40d4666f93408be1bef038b6722404d9a4c2a"), true)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9"), true)
+
+    const txid = await iconDapp.setMetaData({
+      scriptHash: '0x1234567890123456789012345678901234567890',
+      propertyName: 'icon/25x25',
+      value: 'https://www.google.com/',
+    })
+    assert(txid.length > 0)
+    await wait(1200)
+
+    icons = []
+    for await (const iconsPage of iconDapp.listIcons(2)) {
+      icons.push(...iconsPage)
+    }
+
+    assert.strictEqual(icons.length, 6)
+    assert.strictEqual(icons.some(icon => icon.scriptHash==="0x1234567890123456789012345678901234567890"), true)
+  })
+
 })
