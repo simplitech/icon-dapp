@@ -294,7 +294,10 @@ export class IconDapp {
     })
   }
 
-  async* listIcons(): AsyncGenerator<ScriptHashAndIcons, void>{
+  /**
+   * Returns a iterator with all the icons on the smart contract.
+   */
+  async* listIcons(itemsPerRequest: number = 20): AsyncGenerator<ScriptHashAndIcons[], void>{
     const res = await this.config.invoker.testInvoke({
       invocations: [
         IconDapp.buildListIconsInvocation(this.config.scriptHash)
@@ -304,15 +307,19 @@ export class IconDapp {
 
     if (res.stack.length !== 0 && res.session !== undefined && res.stack[0].id !== undefined) {
 
-      let iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, 1)
+      let iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
 
       while (iterator.length !== 0){
-        const iteratorValue = iterator[0].value as StackItemJson[]
-        const scriptHash: string = this.config.parser.parseRpcResponse(iteratorValue[0], {ByteStringToScriptHash: true})
-        const icons: IconProperties & Record<string, any> = this.config.parser.parseRpcResponse(iteratorValue[1])
+        const iconsList = iterator.map((item: StackItemJson) => {
+          const iteratorValue = item.value as StackItemJson[]
+          return {
+            scriptHash: this.config.parser.parseRpcResponse(iteratorValue[0], {ByteStringToScriptHash: true}),
+            icons: this.config.parser.parseRpcResponse(iteratorValue[1]),
+          }
+        })
 
-        yield { scriptHash, icons }
-        iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, 1)
+        yield iconsList
+        iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
       }
     }
     else {
