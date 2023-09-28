@@ -14,10 +14,10 @@ import { NeonInvoker } from '@cityofzion/neon-invoker'
 import { NeonParser } from '@cityofzion/neon-parser'
 
 
-const createIconDapp = async (account?: any) => { 
+const createIconDapp = async () => { 
   return new IconDapp({
     scriptHash: IconDapp.MAINNET,
-    invoker: await NeonInvoker.init('http://seed1.neo.org:10332', account),
+    invoker: await NeonInvoker.init('http://seed1.neo.org:10332'),
     parser: NeonParser,
   })
 }
@@ -109,13 +109,14 @@ Result:
 0x6276c1e3a68280bc6c9c00df755fb691be1162ef
 ```
 
-### `listIcons()`
-Returns an AsyncGenerator with all smart contracts, the value of the generator will be an object with the scriptHash and the icons of a smart contract. 
+### `listIcons(itemsPerRequest: number = 20)`
+Returns an AsyncGenerator with all smart contracts, the value of the generator will be a list of objects with the scriptHash and the icons of a smart contract. The length of the list will be less or equal to the value of the itemsPerRequest parameter.
 ```typescript	
 const callListIcons = async () => {
   const iconDapp = await createIconDapp()
   const icons: { scriptHash: string, icons: object }[] = []
 
+  // You can use another value for the itemsPerRequest parameter if you want to
   for await (const iconsPage of iconDapp.listIcons()) {
     icons.push(...iconsPage)
   }
