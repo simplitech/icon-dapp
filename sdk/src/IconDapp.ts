@@ -1,12 +1,12 @@
 import { IconProperties, SmartContractConfig, ScriptHashAndIcons } from './types'
-import { ContractInvocation, ContractInvocationMulti, Neo3Invoker, StackItemJson } from '@cityofzion/neo3-invoker'
+import { ContractInvocation, ContractInvocationMulti, StackItemJson } from '@cityofzion/neo3-invoker'
 import { Neo3Parser } from '@cityofzion/neo3-parser'
 
 
 export class IconDapp {
 
   static MAINNET = '0x489e98351485bbd85be99618285932172f1862e4'
-  static TESTNET = ''
+  static TESTNET = '0x309b6b2e0538fe4095ecc48e81bb4735388432b5'
   
   constructor(
     private config: SmartContractConfig
