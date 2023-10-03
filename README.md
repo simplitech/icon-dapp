@@ -1,4 +1,13 @@
 # IconDapp
+IconDapp is a hub of icons forall DApps on Neo3.
+
+Learn more about IconDapp at [icondapp.io](https://icondapp.io)
+
+---
+
+IconDapp offers a comprehensive SDK designed to simplify your interactions with its SmartContract. This powerful tool handles all necessary conversions and seamlessly integrates with WalletConnect, ensuring a smooth user experience.
+
+However, if you prefer a more direct approach, checkout ["Direct RPC Calls guide"](DIRECT_RPC_CALLS.md) to learn about making a quick RPC Server call to obtain the specific information you're seeking. Let's dive in and enhance your understanding of IconDapp's capabilities.
 
 ## Install the SDK
 Install the IconDapp, NeonInvoker, and NeonParser packages:

@@ -1,24 +1,24 @@
 import * as sdk from '../dist'
 import fs from 'fs'
 import { wallet } from '@cityofzion/neon-core'
-import { exec as _exec } from 'child_process'
-import { txDidComplete, sleep } from './helpers'
+import { txDidComplete } from './helpers'
 import { NeonParser } from '@cityofzion/neon-parser'
 import { NeonInvoker } from '@cityofzion/neon-invoker'
-import * as util from 'util'
 
 
-async function main(network, signer, timeConstant) {
-    let result
-    const exec = util.promisify(_exec)
-
-    let stdout = (await exec('neoxp contract get -i ../default.neo-express "IconDapp"')).stdout
-    let neoxpContract = JSON.parse(stdout)[0]
-    const scriptHash = neoxpContract.hash
+// node scripts/set_icons.js <scriptHash> <rpcAddress> <privateKey>
+// for testnet, use NhGomBpYnKXArr55nHRQ5rzy79TwKVXZbr account
+// for mainnet, use NbpFLH7ahiaWa4NraTfnrSAfRqCdjrmkoS account
+(async function () {
+  const network = JSON.parse(fs.readFileSync("..\\default.neo-express").toString());
+  const scriptHash = process.argv[2]
+  const rpcAddress = process.argv[3] || 'http://localhost:50012'
+  const privateKey = process.argv[4] || network.wallets[0].accounts[0]['private-key']
+  const account = new wallet.Account(privateKey)
 
     const iconDapp = new sdk.IconDapp({
         scriptHash,
-        invoker: await NeonInvoker.init(network, signer),
+        invoker: await NeonInvoker.init(rpcAddress, account),
         parser: NeonParser,
     })
 
@@ -161,18 +161,7 @@ async function main(network, signer, timeConstant) {
 
     console.log(`Setting metadata transaction ID: ${txid}`)
 
-    await sleep(timeConstant)
-
-    result = await txDidComplete(network, txid, true)
+    const result = await txDidComplete(network, txid, true)
 
     console.log(result)
-}
-
-const networkFile = JSON.parse(fs.readFileSync("..\\default.neo-express").toString());
-
-const node = process.argv[2] || 'http://localhost:50012'
-const pkey = process.argv[3] || networkFile.wallets[0].accounts[0]['private-key']
-const signer = new wallet.Account(pkey)
-const timeConstant = process.argv[4] || 15000
-
-main(node, signer, timeConstant)
+})()
