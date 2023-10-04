@@ -1,5 +1,5 @@
 # IconDapp
-IconDapp is a hub of icons forall DApps on Neo3.
+IconDapp is a hub of icons forall Dapps on Neo3.
 
 Learn more about IconDapp at [icondapp.io](https://icondapp.io)
 
