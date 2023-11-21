@@ -10,23 +10,22 @@ IconDapp offers a comprehensive SDK designed to simplify your interactions with 
 However, if you prefer a more direct approach, checkout ["Direct RPC Calls guide"](DIRECT_RPC_CALLS.md) to learn about making a quick RPC Server call to obtain the specific information you're seeking. Let's dive in and enhance your understanding of IconDapp's capabilities.
 
 ## Install the SDK
-Install the IconDapp, NeonInvoker, and NeonParser packages:
+Install the IconDapp, Neon-DappKit, and Neon-DappKit-Types packages:
 ```bash
-npm i @simplitech/icon-dapp @cityofzion/neon-invoker@1.3.1 @cityofzion/neon-parser@1.5.2
+npm i @simplitech/icon-dapp @cityofzion/neon-dappkit @cityofzion/neon-dappkit-types
 ```
 
 ## How to initialize the SDK
 Import the IconDapp package into your project and create a new instance of the IconDapp class by using NeonInvoker and NeonParser as parameters:
 ```typescript
 import { IconDapp } from '@simplitech/icon-dapp'
-import { NeonInvoker } from '@cityofzion/neon-invoker'
-import { NeonParser } from '@cityofzion/neon-parser'
+import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
 
 
 const createIconDapp = async () => { 
   return new IconDapp({
-    scriptHash: IconDapp.MAINNET,
-    invoker: await NeonInvoker.init('http://seed1.neo.org:10332'),
+    scriptHash,
+    invoker: await NeonInvoker.init({rpcAddress: 'http://127.0.0.1:50012', account}),
     parser: NeonParser,
   })
 }

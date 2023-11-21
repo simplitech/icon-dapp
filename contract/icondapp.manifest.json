@@ -5,7 +5,7 @@
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 1987,
+                "offset": 2014,
                 "parameters": [
                     {
                         "type": "Any",
@@ -67,7 +67,7 @@
             },
             {
                 "name": "updateProperty",
-                "offset": 370,
+                "offset": 379,
                 "parameters": [
                     {
                         "type": "String",
@@ -83,7 +83,7 @@
             },
             {
                 "name": "getProperties",
-                "offset": 614,
+                "offset": 632,
                 "parameters": [],
                 "safe": true,
                 "returntype": "Map",
@@ -96,7 +96,7 @@
             },
             {
                 "name": "setMetaData",
-                "offset": 661,
+                "offset": 679,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -116,7 +116,7 @@
             },
             {
                 "name": "getMetaData",
-                "offset": 922,
+                "offset": 949,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -134,7 +134,7 @@
             },
             {
                 "name": "getMultipleMetaData",
-                "offset": 1031,
+                "offset": 1058,
                 "parameters": [
                     {
                         "type": "Array",
@@ -155,7 +155,7 @@
             },
             {
                 "name": "setContractParent",
-                "offset": 1075,
+                "offset": 1102,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -171,7 +171,7 @@
             },
             {
                 "name": "getContractParent",
-                "offset": 1337,
+                "offset": 1364,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -184,7 +184,7 @@
             },
             {
                 "name": "setOwnership",
-                "offset": 1523,
+                "offset": 1550,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -200,7 +200,7 @@
             },
             {
                 "name": "listIcons",
-                "offset": 1924,
+                "offset": 1951,
                 "parameters": [],
                 "safe": true,
                 "returntype": "InteropInterface",

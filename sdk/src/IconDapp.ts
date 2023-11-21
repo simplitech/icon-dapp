@@ -1,465 +1,317 @@
-import { IconProperties, SmartContractConfig, ScriptHashAndIcons } from './types'
-import { ContractInvocation, ContractInvocationMulti, StackItemJson } from '@cityofzion/neo3-invoker'
-import { Neo3Parser } from '@cityofzion/neo3-parser'
+import { Neo3EventListener, Neo3Invoker, Neo3Parser, TypeChecker } from "@cityofzion/neon-dappkit-types"
+import * as Invocation from './api'
+import { ScriptHashAndIcons, IconProperties } from './types'
 
+export type SmartContractConfig = {
+  scriptHash: string;
+  invoker: Neo3Invoker;
+  parser?: Neo3Parser;
+  eventListener?: Neo3EventListener | null;
+}
 
-export class IconDapp {
-
+export class IconDapp{
   static MAINNET = '0x489e98351485bbd85be99618285932172f1862e4'
   static TESTNET = '0x309b6b2e0538fe4095ecc48e81bb4735388432b5'
-  
-  constructor(
-    private config: SmartContractConfig
-  ) {}
+
+  private config: Required<SmartContractConfig>
+
+	constructor(configOptions: SmartContractConfig) {
+		this.config = { 
+			...configOptions, 
+			parser: configOptions.parser ?? require("@cityofzion/neon-dappkit").NeonParser,
+			eventListener: configOptions.eventListener ?? null
+		}
+	}
+
+  /**
+   * Updates the smart contract if an admin is calling this method
+   */
+	async update(params: { nefFile: string, manifest: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.updateAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
+
+  /**
+   * Tests updating the smart contract
+   */
+	async testUpdate(params: { nefFile: string, manifest: string } ): Promise<void>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.updateAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+	}
 
   /**
    * Returns the name of the owner of the smart contract. The owner is the one who deployed the smart contract.
    */
-  async getOwner(): Promise<string> {
-    const res = await this.config.invoker.testInvoke( {
-      invocations: [
-        IconDapp.buildGetOwnerInvocation(this.config.scriptHash)
-      ],
-      signers: [],
-    })
+	async name(): Promise<string>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.nameAPI(this.config.scriptHash)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0], {ByteStringToScriptHash: true})
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'String' })
+	}
 
   /**
    * Returns the name of the owner of the smart contract. The owner is the one who deployed the smart contract.
    */
-  async getName(): Promise<string> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildNameInvocation(this.config.scriptHash)
-      ],
-      signers: [],
-    })
+  async getOwner(): Promise<string>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getOwnerAPI(this.config.scriptHash)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0])
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Hash160' })
+	}
 
   /**
    * Adds a property to the Icons, e.g., icons-24, icons-36, icons-24-dark (not the final names just examples of properties). (Admin only)
    */
-  async testAddProperty(options: {propertyName: string, description: string}): Promise<boolean> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildAddPropertyInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {propertyName: options.propertyName, description: options.description}
-        )
-      ],
-      signers: [],
-    })
-
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return Boolean(res.stack[0].value)
-  }
+  async addProperty(params: { propertyName: string, description: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.addPropertyAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
 
   /**
    * Adds a property to the Icons, e.g., icons-24, icons-36, icons-24-dark (not the final names just examples of properties). (Admin only)
    */
-  async addProperty(options: {propertyName: string, description: string}): Promise<string> {
-    return await this.config.invoker.invokeFunction({
-      invocations: [
-        IconDapp.buildAddPropertyInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {propertyName: options.propertyName, description: options.description}
-        )
-      ],
-      signers: [],
-    })
-  }
+	async testAddProperty(params: { propertyName: string, description: string } ): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.addPropertyAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
 
   /**
    * Updates a property to the Icons, e.g., icons-24, icons-36, icons-24-dark (not the final names just examples of properties). (Admin only)
    */
-  async testUpdateProperty(options: {propertyName: string, description: string}): Promise<boolean> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildUpdatePropertyInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {propertyName: options.propertyName, description: options.description}
-        )
-      ],
-      signers: [],
-    })
-
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return Boolean(res.stack[0].value)
-  }
+	async updateProperty(params: { propertyName: string, description: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.updatePropertyAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
 
   /**
    * Updates a property to the Icons, e.g., icons-24, icons-36, icons-24-dark (not the final names just examples of properties). (Admin only)
    */
-  async updateProperty(options: {propertyName: string, description: string}): Promise<string> {
-    return await this.config.invoker.invokeFunction({
-      invocations: [
-        IconDapp.buildUpdatePropertyInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {propertyName: options.propertyName, description: options.description}
-        )
-      ],
-      signers: [],
-    })
-  }
+	async testUpdateProperty(params: { propertyName: string, description: string } ): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.updatePropertyAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
 
   /**
    * Returns all Icon properties.
    */
-  async getProperties(): Promise<IconProperties & Record<string, any>> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildGetPropertiesInvocation(this.config.scriptHash)
-      ],
-      signers: [],
-    })
+	async getProperties(): Promise<IconProperties & Record<string, any>> {
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getPropertiesAPI(this.config.scriptHash)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0])
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Map' })
+	}
 
   /**
    * Adds a property to the metadata of a smart contract. (Admin and deployer only)
    */
-  async testSetMetaData(options: {scriptHash: string, propertyName: string, value: string}): Promise<boolean> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildSetMetaDataInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {scriptHash: options.scriptHash, propertyName: options.propertyName, value: options.value}
-        )
-      ],
-      signers: [],
-    })
-
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return Boolean(res.stack[0].value)
-  }
+	async setMetaData(params: { scriptHash: string, propertyName: string, value: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.setMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
 
   /**
    * Adds a property to the metadata of a smart contract. (Admin and deployer only)
    */
-  async setMetaData(options: {scriptHash: string, propertyName: string, value: string}): Promise<string> {
-    return await this.config.invoker.invokeFunction({
-      invocations: [
-        IconDapp.buildSetMetaDataInvocation(
-          this.config.scriptHash,
-          this.config.parser,
-          {scriptHash: options.scriptHash, propertyName: options.propertyName, value: options.value}
-        )
-      ],
-      signers: [],
-    })
-  }
+	async testSetMetaData(params: { scriptHash: string, propertyName: string, value: string } ): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.setMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
 
   /**
    * Returns the metadata of a smart contract. If the smart contract is a child it will return a map with 'parent' as a key.
    */
-  async getMetaData(options: {scriptHash: string}): Promise<IconProperties & Record<string, any>> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildGetMetaDataInvocation(this.config.scriptHash, {scriptHash: options.scriptHash})
-      ],
-      signers: [],
-    })
+	async getMetaData(params: { scriptHash: string } ): Promise<IconProperties & Record<string, any>> {
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0])
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Map' })
+	}
 
   /**
    * Returns the metadata of multiple smart contracts.
    */
-  async getMultipleMetaData(options: { contractHashes: string[] }): Promise<Map<string, Map<string, string>>[]> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildGetMultipleMetaDataInvocation(this.config.scriptHash, {contractHashes: options.contractHashes})
-      ],
-      signers: [],
-    })
+	async getMultipleMetaData(params: { contractHashes: string[] } ): Promise<Map<string, Map<string, string>>[]> {
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getMultipleMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0], {ByteStringToScriptHash: true})
-  }
-
-  /**
-   * Sets the parent of a smart contract, children will have the same metadata as the parent. (Admin and deployer only)
-   */
-  async testSetContractParent(options: { childHash: string, parentHash: string }): Promise<boolean> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
-      ],
-      signers: [],
-    })
-
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return Boolean(res.stack[0].value)
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { 
+			type: 'Map', 
+			genericKey: { type: 'Hash160' }, 
+			genericItem: { type: 'Map', genericKey: { type: 'String' }, genericItem: { type: 'String' } }
+		})
+	}
 
   /**
    * Sets the parent of a smart contract, children will have the same metadata as the parent. (Admin and deployer only)
    */
-  async setContractParent(options: { childHash: string, parentHash: string }): Promise<string> {
-    return await this.config.invoker.invokeFunction({
-      invocations: [
-        IconDapp.buildSetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash, parentHash: options.parentHash})
-      ],
-      signers: [],
-    })
-  }
+	async setContractParent(params: { childHash: string, parentHash: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.setContractParentAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
+
+  /**
+   * Sets the parent of a smart contract, children will have the same metadata as the parent. (Admin and deployer only)
+   */
+	async testSetContractParent(params: { childHash: string, parentHash: string } ): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.setContractParentAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
 
   /**
    * Returns the parent of a smart contract. If there is no parent it will return null.
    */
-  async getContractParent(options: { childHash: string }): Promise<string> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildGetContractParentInvocation(this.config.scriptHash, {childHash: options.childHash})
-      ],
-      signers: [],
-    })
+	async getContractParent(params: { childHash: string } ): Promise<string>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getContractParentAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
 
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return this.config.parser.parseRpcResponse(res.stack[0], {ByteStringToScriptHash: true})
-  }
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Hash160' })
+	}
 
   /**
    * Sets the owner of a smart contract. If sender is not the owner of the smart contract, then it will return false.
    */
-  async testSetOwnership(options: { scriptHash: string, sender: string }): Promise<boolean> {
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
-      ],
-      signers: [],
-    })
-
-    if (res.stack.length === 0) {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-
-    return Boolean(res.stack[0].value)
-  }
+	async setOwnership(params: { scriptHash: string, contractOwner: string } ): Promise<string>{
+		return await this.config.invoker.invokeFunction({
+			invocations: [Invocation.setOwnershipAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+	}
 
   /**
    * Sets the owner of a smart contract. If sender is not the owner of the smart contract, then it will return false.
    */
-  async setOwnership(options: { scriptHash: string, sender: string }): Promise<string> {
-    return await this.config.invoker.invokeFunction({
-      invocations: [
-        IconDapp.buildSetOwnershipInvocation(this.config.scriptHash, {scriptHash: options.scriptHash, sender: options.sender})
-      ],
-      signers: [],
-    })
-  }
+	async testSetOwnership(params: { scriptHash: string, contractOwner: string } ): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.setOwnershipAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
 
   /**
    * Returns a iterator with all the icons on the smart contract.
    */
-  async* listIcons(itemsPerRequest: number = 20): AsyncGenerator<ScriptHashAndIcons[], void>{
-    const res = await this.config.invoker.testInvoke({
-      invocations: [
-        IconDapp.buildListIconsInvocation(this.config.scriptHash)
-      ],
-      signers: [],
-    })
+	async* listIcons(itemsPerRequest: number = 20): AsyncGenerator<ScriptHashAndIcons[], void> {
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.listIconsAPI(this.config.scriptHash)],
+			signers: [],
+		})
 
-    if (res.stack.length !== 0 && res.session !== undefined && res.stack[0].id !== undefined) {
+		if (res.stack.length !== 0 && res.session !== undefined && TypeChecker.isStackTypeInteropInterface(res.stack[0])) {
 
-      let iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
+			let iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
 
-      while (iterator.length !== 0){
-        const iconsList = iterator.map((item: StackItemJson) => {
-          const iteratorValue = item.value as StackItemJson[]
-          return {
-            scriptHash: this.config.parser.parseRpcResponse(iteratorValue[0], {ByteStringToScriptHash: true}),
-            icons: this.config.parser.parseRpcResponse(iteratorValue[1]),
-          }
-        })
+			while (iterator.length !== 0){
+				if (TypeChecker.isStackTypeInteropInterface(iterator[0])){
+					throw new Error(res.exception ?? 'can not have an iterator inside another iterator')
+				}else{
+					const iteratorValues = iterator.map((item) => {
+            if (!TypeChecker.isStackTypeInteropInterface(item)){
+              return {
+                scriptHash: this.config.parser.parseRpcResponse(item.value[0], { type: "Hash160"}),
+                icons: this.config.parser.parseRpcResponse(item.value[1], { type: "String" }),
+              }
+            } else {
+              return this.config.parser.parseRpcResponse(item)
+            }
+					})
 
-        yield iconsList
-        iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
-      }
-    }
-    else {
-      throw new Error(res.exception ?? 'unrecognized response')
-    }
-  }
-
-  async invokeFunction(cim: ContractInvocationMulti): Promise<string>{
-    return await this.config.invoker.invokeFunction(cim)
-  }
-
-  static buildGetOwnerInvocation(scriptHash: string): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'getOwner',
-      args: []
-    }
-  }
-  
-  static buildNameInvocation(scriptHash: string): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'name',
-      args: []
-    }
-  }
-  
-  static buildAddPropertyInvocation(scriptHash: string, parser: Neo3Parser, params: {propertyName: string, description: string}): ContractInvocation{
-    if (params.propertyName.length >= 31 || params.propertyName.length <= 0){
-      throw new Error('Length of propertyName is incorrect, it should be between 1 and 30');
-    }
-  
-    if (params.description.length >= 255 || params.description.length <= 0){
-      throw new Error('Length of description is incorrect, it should be between 1 and 254');
-    }
-    
-    return {
-      scriptHash,
-      operation: 'addProperty',
-      args: [
-        {type: 'ByteArray', value: parser.strToBase64(params.propertyName)},
-        {type: 'ByteArray', value: parser.strToBase64(params.description)},
-      ]
-    }
-  }
-  
-  static buildUpdatePropertyInvocation(scriptHash: string, parser: Neo3Parser, params: {propertyName: string, description: string}): ContractInvocation{
-    if (params.propertyName.length >= 31 || params.propertyName.length <= 0){
-      throw new Error('Length of propertyName is incorrect, it should be between 1 and 30');
-    }
-  
-    if (params.description.length >= 255 || params.description.length <= 0){
-      throw new Error('Length of description is incorrect, it should be between 1 and 254');
-    }
-    
-    return {
-      scriptHash,
-      operation: 'updateProperty',
-      args: [
-        {type: 'ByteArray', value: parser.strToBase64(params.propertyName)},
-        {type: 'ByteArray', value: parser.strToBase64(params.description)},
-      ]
-    }
-  }
-  
-  static buildGetPropertiesInvocation(scriptHash: string): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'getProperties',
-      args: []
-    }
-  }
-  
-  static buildSetMetaDataInvocation(scriptHash: string, parser: Neo3Parser, params: {scriptHash: string, propertyName: string, value: string}): ContractInvocation{
-    if (params.value.length >= 390 || params.value.length <= 0){
-      throw new Error('Length of value is incorrect, it should be between 1 and 389');
-    }
-    
-    return {
-      scriptHash,
-      operation: 'setMetaData',
-      args: [
-        {type: 'Hash160', value: params.scriptHash},
-        {type: 'ByteArray', value: parser.strToBase64(params.propertyName)},
-        {type: 'ByteArray', value: parser.strToBase64(params.value)},
-      ]
-    }
-  }
-  
-  static buildGetMetaDataInvocation(scriptHash: string, params: {scriptHash: string}): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'getMetaData',
-      args: [{ type: 'Hash160', value: params.scriptHash }]
-    }
-  }
-  
-  static buildGetMultipleMetaDataInvocation(scriptHash: string, params: {contractHashes: string[]}): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'getMultipleMetaData',
-      args: [{ type: 'Array', value: params.contractHashes.map(hash => ({ type: 'Hash160', value: hash })) }],
-    }
-  }
-  
-  static buildSetContractParentInvocation(scriptHash: string, params: {childHash: string, parentHash: string}): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'setContractParent',
-      args: [
-        { type: 'Hash160', value: params.childHash },
-        { type: 'Hash160', value: params.parentHash },
-      ]
-    }
-  }
-  
-  static buildGetContractParentInvocation(scriptHash: string, params: {childHash: string}): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'getContractParent',
-      args: [{ type: 'Hash160', value: params.childHash }],
-    }
-  }
-  
-  static buildSetOwnershipInvocation(scriptHash: string, params: {scriptHash: string, sender: string}): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'setOwnership',
-      args: [
-        { type: 'Hash160', value: params.scriptHash },
-        { type: 'Hash160', value: params.sender },
-      ],
-    }
-  }
-  
-  static buildListIconsInvocation(scriptHash: string): ContractInvocation{
-    return {
-      scriptHash,
-      operation: 'listIcons',
-      args: [],
-    }
-  }
+					yield iteratorValues
+					iterator = await this.config.invoker.traverseIterator(res.session, res.stack[0].id, itemsPerRequest)
+				}
+			}
+		}
+		else {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+	}
 }
