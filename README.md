@@ -10,23 +10,26 @@ IconDapp offers a comprehensive SDK designed to simplify your interactions with 
 However, if you prefer a more direct approach, checkout ["Direct RPC Calls guide"](DIRECT_RPC_CALLS.md) to learn about making a quick RPC Server call to obtain the specific information you're seeking. Let's dive in and enhance your understanding of IconDapp's capabilities.
 
 ## Install the SDK
-Install the IconDapp, NeonInvoker, and NeonParser packages:
+Install the IconDapp, Neon-DappKit, and Neon-DappKit-Types packages:
 ```bash
-npm i @simplitech/icon-dapp @cityofzion/neon-invoker@1.3.1 @cityofzion/neon-parser@1.5.2
+npm i @simplitech/icon-dapp @cityofzion/neon-dappkit @cityofzion/neon-dappkit-types
 ```
 
 ## How to initialize the SDK
-Import the IconDapp package into your project and create a new instance of the IconDapp class by using NeonInvoker and NeonParser as parameters:
+Import the IconDapp package into your project and create a new instance of the IconDapp class by using a class that implements the Neo3Invoker interface and a class that implements the Neo3Parser interface as parameters.
+
+If your goal is to extract blockchain data or manage transaction signing in your own backend, consider utilizing NeonInvoker and NeonParser from [NeonDappkit](https://github.com/CityOfZion/neon-dappkit/). However, for enabling users to contribute data to the blockchain via your application, [WalletConnect](https://github.com/CityOfZion/wallet-connect-sdk) could be a more suitable choice than NeonInvoker.
+
+Below is an illustration of using NeonInvoker for data retrieval:
 ```typescript
 import { IconDapp } from '@simplitech/icon-dapp'
-import { NeonInvoker } from '@cityofzion/neon-invoker'
-import { NeonParser } from '@cityofzion/neon-parser'
+import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
 
 
 const createIconDapp = async () => { 
   return new IconDapp({
     scriptHash: IconDapp.MAINNET,
-    invoker: await NeonInvoker.init('http://seed1.neo.org:10332'),
+    invoker: await NeonInvoker.init({rpcAddress: 'http://127.0.0.1:50012'}),
     parser: NeonParser,
   })
 }

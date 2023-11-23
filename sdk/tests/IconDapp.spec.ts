@@ -5,8 +5,7 @@ import {IconDapp} from '../src'
 import {exec as _exec, spawn} from 'child_process'
 import {afterEach} from 'mocha'
 import * as util from 'util'
-import { NeonInvoker } from '@cityofzion/neon-invoker'
-import { NeonParser } from '@cityofzion/neon-parser'
+import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
 
 describe('Basic IconDapp Test Suite', function () {
   this.timeout(60000)
@@ -20,7 +19,7 @@ describe('Basic IconDapp Test Suite', function () {
   const getSdk = async (account?: any) => {
     return new IconDapp({
       scriptHash,
-      invoker: await NeonInvoker.init('http://127.0.0.1:50012', account),
+      invoker: await NeonInvoker.init({rpcAddress: 'http://127.0.0.1:50012', account}),
       parser: NeonParser,
     })
   }
@@ -53,7 +52,7 @@ describe('Basic IconDapp Test Suite', function () {
   it('Tests getName', async () => {
     const iconDapp = await getSdk()
 
-    const resp = await iconDapp.getName()
+    const resp = await iconDapp.name()
     assert.equal(resp, 'IconDapp')
   })
 
@@ -255,29 +254,28 @@ describe('Basic IconDapp Test Suite', function () {
     assert.equal(resp, true)
   })
 
-  it('Tests addProperties, setMetaData and getMetaData',
-    async () => {
-      const owner = wallets.find((wallet: any) => wallet.name === 'owner')
-      const iconDapp = await getSdk(owner.account)
-      await iconDapp.addProperty({
-        propertyName: 'prop1',
-        description: 'description1',
-      })
-      await wait(1200)
+  it('Tests addProperties, setMetaData and getMetaData', async () => {
+    const owner = wallets.find((wallet: any) => wallet.name === 'owner')
+    const iconDapp = await getSdk(owner.account)
+    await iconDapp.addProperty({
+      propertyName: 'prop1',
+      description: 'description1',
+    })
+    await wait(1200)
 
-      const txid = await iconDapp.setMetaData({
-        scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
-        propertyName: 'prop1',
-        value: 'https://www.google.com/',
-      })
-      assert(txid.length > 0)
-      await wait(1200)
+    const txid = await iconDapp.setMetaData({
+      scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
+      propertyName: 'prop1',
+      value: 'https://www.google.com/',
+    })
+    assert(txid.length > 0)
+    await wait(1200)
 
-      const resp = await iconDapp.getMetaData({
-        scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
-      })
+    const resp = await iconDapp.getMetaData({
+      scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
+    })
 
-      assert.equal(resp.prop1, 'https://www.google.com/')
+    assert.equal(resp.prop1, 'https://www.google.com/')
   })
 
   it('Tests setMetaData invalid length',
@@ -315,16 +313,18 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    await iconDapp.setMetaData({
+    const txid1 = await iconDapp.setMetaData({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
       propertyName: 'prop1',
       value: 'https://www.google.com/',
     })
-    await iconDapp.setMetaData({
+    const txid2 = await iconDapp.setMetaData({
       scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
       propertyName: 'prop1',
       value: 'https://www.reddit.com/',
     })
+    assert(txid1.length > 0)
+    assert(txid2.length > 0)
     await wait(1200)
 
     const resp: any = await iconDapp.getMultipleMetaData({
@@ -388,12 +388,12 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     const {stdout} = await exec('neoxp contract get "Ownership" -i ../default.neo-express')
-    
+
     const {hash} = JSON.parse(stdout)[0]
 
     await iconDappForUser.setOwnership({
       scriptHash: hash,
-      sender: user.account.scriptHash,
+      contractOwner: user.account.scriptHash,
     })
     await wait(1200)
 
@@ -441,7 +441,7 @@ describe('Basic IconDapp Test Suite', function () {
     // user is claiming ownership of the smart contract they deployed
     const txid = await iconDappUser.setOwnership({
       scriptHash: contractScriptHash,
-      sender: userOwner.account.scriptHash,
+      contractOwner: userOwner.account.scriptHash,
     })
     assert(txid.length > 0)
     await wait(1200)
