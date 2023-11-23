@@ -18,7 +18,9 @@ npm i @simplitech/icon-dapp @cityofzion/neon-dappkit @cityofzion/neon-dappkit-ty
 ## How to initialize the SDK
 Import the IconDapp package into your project and create a new instance of the IconDapp class by using a class that implements the Neo3Invoker interface and a class that implements the Neo3Parser interface as parameters.
 
-If you are going to use the IconDapp SDK to get information from the blockchain you should probably use [NeonInvoker](https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/src/NeonInvoker.ts) and [NeonParser](https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/src/NeonParser.ts) and not use an account to sign the transactions, but if you intend to use the SDK to add information to the blockchain you might want to use [WalletConnect](https://github.com/CityOfZion/wallet-connect-sdk) instead of NeonInvoker:
+If your goal is to extract blockchain data or manage transaction signing in your own backend, consider utilizing NeonInvoker and NeonParser from [NeonDappkit](https://github.com/CityOfZion/neon-dappkit/). However, for enabling users to contribute data to the blockchain via your application, [WalletConnect](https://github.com/CityOfZion/wallet-connect-sdk) could be a more suitable choice than NeonInvoker.
+
+Below is an illustration of using NeonInvoker for data retrieval:
 ```typescript
 import { IconDapp } from '@simplitech/icon-dapp'
 import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
