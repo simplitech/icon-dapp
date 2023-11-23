@@ -12,7 +12,7 @@ However, if you prefer a more direct approach, checkout ["Direct RPC Calls guide
 ## Install the SDK
 Install the IconDapp, Neon-DappKit, and Neon-DappKit-Types packages:
 ```bash
-npm i @simplitech/icon-dapp @cityofzion/neon-dappkit @cityofzion/neon-dappkit-types
+npm i @simpli/icondapp @cityofzion/neon-dappkit @cityofzion/neon-dappkit-types
 ```
 
 ## How to initialize the SDK
@@ -22,7 +22,7 @@ If your goal is to extract blockchain data or manage transaction signing in your
 
 Below is an illustration of using NeonInvoker for data retrieval:
 ```typescript
-import { IconDapp } from '@simplitech/icon-dapp'
+import { IconDapp } from '@simpli/icondapp'
 import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
 
 
