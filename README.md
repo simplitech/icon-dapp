@@ -29,7 +29,7 @@ import { NeonInvoker, NeonParser } from '@cityofzion/neon-dappkit'
 const createIconDapp = async () => { 
   return new IconDapp({
     scriptHash: IconDapp.MAINNET,
-    invoker: await NeonInvoker.init({rpcAddress: 'http://127.0.0.1:50012'}),
+    invoker: await NeonInvoker.init({rpcAddress: 'http://seed1.neo.org:10332'}),
     parser: NeonParser,
   })
 }
