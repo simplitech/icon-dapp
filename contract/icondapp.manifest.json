@@ -5,7 +5,7 @@
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 2014,
+                "offset": 2012,
                 "parameters": [
                     {
                         "type": "Any",
@@ -199,8 +199,24 @@
                 "returntype": "Boolean"
             },
             {
+                "name": "canChangeMetaData",
+                "offset": 1582,
+                "parameters": [
+                    {
+                        "type": "Hash160",
+                        "name": "contract_script_hash"
+                    },
+                    {
+                        "type": "Hash160",
+                        "name": "contract_owner"
+                    }
+                ],
+                "safe": true,
+                "returntype": "Boolean"
+            },
+            {
                 "name": "listIcons",
-                "offset": 1951,
+                "offset": 1949,
                 "parameters": [],
                 "safe": true,
                 "returntype": "InteropInterface",
