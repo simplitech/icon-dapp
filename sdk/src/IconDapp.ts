@@ -1,4 +1,4 @@
-import { Neo3EventListener, Neo3Invoker, Neo3Parser, TypeChecker } from "@cityofzion/neon-dappkit-types"
+import { Neo3EventListener, Neo3Invoker, Neo3Parser, Signer, TypeChecker } from "@cityofzion/neon-dappkit-types"
 import * as Invocation from './api'
 import { ScriptHashAndIcons, IconProperties } from './types'
 
@@ -254,20 +254,33 @@ export class IconDapp{
   /**
    * Sets the owner of a smart contract. If sender is not the owner of the smart contract, then it will return false.
    */
-	async setOwnership(params: { scriptHash: string, contractOwner: string } ): Promise<string>{
+	async setOwnership(params: { scriptHash: string, contractOwner: string }, signers: Signer[] = [] ): Promise<string>{
 		return await this.config.invoker.invokeFunction({
 			invocations: [Invocation.setOwnershipAPI(this.config.scriptHash, params, this.config.parser)],
-			signers: [],
+			signers,
 		})
 	}
 
   /**
    * Sets the owner of a smart contract. If sender is not the owner of the smart contract, then it will return false.
    */
-	async testSetOwnership(params: { scriptHash: string, contractOwner: string } ): Promise<boolean>{
+	async testSetOwnership(params: { scriptHash: string, contractOwner: string }, signers: Signer[] = [] ): Promise<boolean>{
 		const res = await this.config.invoker.testInvoke({
 			invocations: [Invocation.setOwnershipAPI(this.config.scriptHash, params, this.config.parser)],
-			signers: [],
+			signers,
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
+	}
+
+	async canChangeMetaData(params: { contractScriptHash: string, contractOwner: string }, signers: Signer[] = []): Promise<boolean>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.canChangeMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers,
 		})
 
 		if (res.stack.length === 0) {

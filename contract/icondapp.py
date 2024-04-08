@@ -4,6 +4,7 @@ from boa3.builtin.compile_time import NeoMetadata, metadata, public
 from boa3.builtin.interop import runtime, storage
 from boa3.builtin.interop.blockchain import Transaction
 from boa3.builtin.interop.contract import Contract
+from boa3.builtin.interop.contract.contractmanifest import ContractAbi
 from boa3.builtin.interop.contract.contractmanifest import ContractManifest
 from boa3.builtin.interop.iterator import Iterator
 from boa3.builtin.nativecontract.contractmanagement import ContractManagement
@@ -248,44 +249,46 @@ def get_contract_owner(script_hash: UInt160) -> Optional[UInt160]:
 
 @public(name='setOwnership')
 def set_ownership(script_hash: UInt160, contract_owner: UInt160) -> bool:
-    # if it's not icon dapp admin, needs to check if it's the contract deployer
-    if runtime.check_witness(get_owner()):
-        contract_deployer = contract_owner
-    else:
-        current_contract_owner: UInt160 = get_contract_owner(script_hash)
-        # using two if's instead of one with a 'and' operation because it had runtime errors
-        if isinstance(current_contract_owner, UInt160):
-            # the contract owner can change the contract ownership
-            # if it's not signed by the contract owner, checks if it's signed by the given address
-            if not runtime.check_witness(current_contract_owner):
-                if not runtime.check_witness(contract_owner):
-                    raise Exception('No authorization')
-
-            contract_deployer = contract_owner
-        else:
-            if not runtime.check_witness(contract_owner):
-                raise Exception('No authorization')
-
-            contract_deployer = get_deployer(script_hash, contract_owner)
-
-    if isinstance(contract_deployer, UInt160):
+    if can_change_meta_data(script_hash, contract_owner):
         contract_owner_key = get_contract_owner_key(script_hash)
-        storage.put(contract_owner_key, contract_deployer)
+        storage.put(contract_owner_key, contract_owner)
         return True
     return False
 
 
-def get_deployer(script_hash: UInt160, sender: UInt160) -> Optional[UInt160]:
-    contract: Contract = ContractManagement.get_contract(script_hash)
+@public(name='canChangeMetaData', safe=True)
+def can_change_meta_data(contract_script_hash: UInt160, contract_owner: UInt160) -> bool:
+    contract: Contract = ContractManagement.get_contract(contract_script_hash)
     if not isinstance(contract, Contract):
-        return None
+        return False
+    
+    icon_dapp_owner = get_owner()
+    if runtime.check_witness(icon_dapp_owner):
+        return True
 
-    computed_script_hash: bytes = _compute_contract_hash(sender, contract)
-    if computed_script_hash != script_hash:
-        return None
+    contract_abi: ContractAbi = contract.manifest.abi
+    has_verify = False
+    for method in contract_abi.methods:
+        if method.name == 'verify':
+            has_verify = True
+            break
+    if has_verify:
+        if runtime.check_witness(contract_script_hash):
+            return True
+        else:
+            return False
 
-    return sender
+    current_contract_owner: UInt160 = get_contract_owner(contract_script_hash)
+    if isinstance(current_contract_owner, UInt160):
+        if runtime.check_witness(current_contract_owner):
+            return True
 
+    # check if the contract was deployed by the given address
+    computed_script_hash: bytes = _compute_contract_hash(contract_owner, contract)
+    if computed_script_hash == contract_script_hash:
+        return True
+
+    return False
 
 def _compute_contract_hash(sender: UInt160, contract: Contract) -> bytes:
     # there's a bug with calling contract.nef[:4] directly

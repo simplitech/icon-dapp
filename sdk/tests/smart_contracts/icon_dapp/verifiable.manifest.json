@@ -1,0 +1,83 @@
+{
+    "name": "verifiable",
+    "groups": [],
+    "abi": {
+        "methods": [
+            {
+                "name": "verify",
+                "offset": 0,
+                "parameters": [],
+                "safe": false,
+                "returntype": "Boolean"
+            },
+            {
+                "name": "change_adm",
+                "offset": 35,
+                "parameters": [
+                    {
+                        "type": "Hash160",
+                        "name": "address"
+                    }
+                ],
+                "safe": false,
+                "returntype": "Void"
+            },
+            {
+                "name": "get_adm",
+                "offset": 61,
+                "parameters": [],
+                "safe": false,
+                "returntype": "Hash160"
+            },
+            {
+                "name": "update",
+                "offset": 91,
+                "parameters": [
+                    {
+                        "type": "ByteArray",
+                        "name": "nef"
+                    },
+                    {
+                        "type": "String",
+                        "name": "manifest"
+                    },
+                    {
+                        "type": "Any",
+                        "name": "data"
+                    }
+                ],
+                "safe": false,
+                "returntype": "Void"
+            },
+            {
+                "name": "_deploy",
+                "offset": 105,
+                "parameters": [
+                    {
+                        "type": "Any",
+                        "name": "data"
+                    },
+                    {
+                        "type": "Boolean",
+                        "name": "update"
+                    }
+                ],
+                "safe": false,
+                "returntype": "Void"
+            }
+        ],
+        "events": []
+    },
+    "permissions": [
+        {
+            "contract": "0xfffdc93764dbaddd97c48f252a53ea4643faa3fd",
+            "methods": [
+                "update"
+            ]
+        }
+    ],
+    "trusts": [],
+    "features": {},
+    "supportedstandards": [],
+    "extra": null
+}

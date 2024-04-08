@@ -11,7 +11,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "ts-mocha tests/**/*.spec.ts",
@@ -26,7 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "@cityofzion/neon-core": "5.5.1",
-    "@cityofzion/neon-dappkit": "0.3.1",
+    "@cityofzion/neon-dappkit": "0.4.1",
     "@cityofzion/neon-dappkit-types": "0.3.1",
     "@types/lodash": "^4.14.176",
     "@types/node": "^16.11.11",
