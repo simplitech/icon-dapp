@@ -150,20 +150,20 @@ export class IconDapp{
   /**
    * Adds a property to the metadata of a smart contract. (Admin and deployer only)
    */
-	async setMetaData(params: { scriptHash: string, propertyName: string, value: string } ): Promise<string>{
+	async setMetadata(params: { owner?: string, scriptHash: string, propertyName: string, value: string }, signers: Signer[] = [] ): Promise<string>{
 		return await this.config.invoker.invokeFunction({
-			invocations: [Invocation.setMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
-			signers: [],
+			invocations: [Invocation.setMetadataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers,
 		})
 	}
 
   /**
    * Adds a property to the metadata of a smart contract. (Admin and deployer only)
    */
-	async testSetMetaData(params: { scriptHash: string, propertyName: string, value: string } ): Promise<boolean>{
+	async testSetMetadata(params: { scriptHash: string, propertyName: string, value: string, owner?: string }, signers: Signer[] = [] ): Promise<boolean>{
 		const res = await this.config.invoker.testInvoke({
-			invocations: [Invocation.setMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
-			signers: [],
+			invocations: [Invocation.setMetadataAPI(this.config.scriptHash, params, this.config.parser)],
+			signers,
 		})
 
 		if (res.stack.length === 0) {
@@ -176,9 +176,9 @@ export class IconDapp{
   /**
    * Returns the metadata of a smart contract. If the smart contract is a child it will return a map with 'parent' as a key.
    */
-	async getMetaData(params: { scriptHash: string } ): Promise<IconProperties & Record<string, any>> {
+	async getMetadata(params: { scriptHash: string } ): Promise<IconProperties & Record<string, any>> {
 		const res = await this.config.invoker.testInvoke({
-			invocations: [Invocation.getMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			invocations: [Invocation.getMetadataAPI(this.config.scriptHash, params, this.config.parser)],
 			signers: [],
 		})
 
@@ -192,9 +192,9 @@ export class IconDapp{
   /**
    * Returns the metadata of multiple smart contracts.
    */
-	async getMultipleMetaData(params: { contractHashes: string[] } ): Promise<Map<string, Map<string, string>>[]> {
+	async getMultipleMetadata(params: { contractHashes: string[] } ): Promise<Map<string, Map<string, string>>[]> {
 		const res = await this.config.invoker.testInvoke({
-			invocations: [Invocation.getMultipleMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			invocations: [Invocation.getMultipleMetadataAPI(this.config.scriptHash, params, this.config.parser)],
 			signers: [],
 		})
 
@@ -251,6 +251,24 @@ export class IconDapp{
 		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Hash160' })
 	}
 
+	
+  /**
+   * Returns the parent of a smart contract. If there is no parent it will return null.
+   */
+	async getContractOwner(params: { scriptHash: string } ): Promise<string>{
+		const res = await this.config.invoker.testInvoke({
+			invocations: [Invocation.getContractOwnerAPI(this.config.scriptHash, params, this.config.parser)],
+			signers: [],
+		})
+
+		if (res.stack.length === 0) {
+			throw new Error(res.exception ?? 'unrecognized response')
+		}
+		
+		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Hash160' })
+	}
+
+
   /**
    * Sets the owner of a smart contract. If sender is not the owner of the smart contract, then it will return false.
    */
@@ -277,9 +295,9 @@ export class IconDapp{
 		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
 	}
 
-	async canChangeMetaData(params: { contractScriptHash: string, contractOwner: string }, signers: Signer[] = []): Promise<boolean>{
+	async canChangeMetadata(params: { contractScriptHash: string, contractOwner: string }, signers: Signer[] = []): Promise<boolean>{
 		const res = await this.config.invoker.testInvoke({
-			invocations: [Invocation.canChangeMetaDataAPI(this.config.scriptHash, params, this.config.parser)],
+			invocations: [Invocation.canChangeMetadataAPI(this.config.scriptHash, params, this.config.parser)],
 			signers,
 		})
 

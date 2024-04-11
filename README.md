@@ -56,13 +56,13 @@ Result:
 }
 ```
 
-### `getMetaData(options: {scriptHash: string})`
+### `getMetadata(options: {scriptHash: string})`
 Returns an object with the metadata about the icons of a smart contract. If the smart contract is a child it will return an object with 'parent' as a key.
 ```typescript
-const callGetMetaData = async () => {
+const callGetMetadata = async () => {
   const iconDapp = await createIconDapp()
   // Getting the icons of the GAS contract
-  const gasIcons = await iconDapp.getMetaData({
+  const gasIcons = await iconDapp.getMetadata({
     scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf"
   })
   console.log(gasIcons)
@@ -76,12 +76,12 @@ Result:
 }
 ```
 
-### `getMultipleMetaData(options: { contractHashes: string[] })`
+### `getMultipleMetadata(options: { contractHashes: string[] })`
 Returns an object with the metadata about the icons of multiple smart contracts.
 ```typescript	
-const callGetMultipleMetaData = async () => {
+const callGetMultipleMetadata = async () => {
   const iconDapp = await createIconDapp()
-  const neoBlockchainTokensIcons = await iconDapp.getMultipleMetaData({
+  const neoBlockchainTokensIcons = await iconDapp.getMultipleMetadata({
     contractHashes: [
       "0xd2a4cff31913016155e38e474a2c06d08be276cf",
       "0xef4073a0f2b305a38ec4050e4d3d28bc40ea63f5"
@@ -105,7 +105,7 @@ Result:
 ```
 
 ### `getContractParent(options: { childHash: string })`
-A Dapp is often composed of multiple SmartContracts, so in IconDapp, we group them using the keyword "parent." In short, a Dapp has a single "parent" SmartContract for multiple children. If you require information about a SmartContract's parent, you can utilize the getContractParent method. It's important to note that this method is unnecessary for retrieving an icon associated with a child scripthash; you can still utilize getMetaData for this purpose.
+A Dapp is often composed of multiple SmartContracts, so in IconDapp, we group them using the keyword "parent." In short, a Dapp has a single "parent" SmartContract for multiple children. If you require information about a SmartContract's parent, you can utilize the getContractParent method. It's important to note that this method is unnecessary for retrieving an icon associated with a child scripthash; you can still utilize getMetadata for this purpose.
 ```typescript
 const callGetContractParent = async () => {
   const iconDapp = await createIconDapp()

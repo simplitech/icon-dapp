@@ -141,8 +141,25 @@ def get_properties() -> dict:
         return {}
 
 
-@public(name="setMetaData")
-def set_meta_data(script_hash: UInt160, property_name: str, value: str) -> bool:
+@public(name="setMetadata")
+def set_owner_and_metadata(owner: UInt160, contract_script_hash: UInt160, property_name: str, value: str) -> bool:
+    contract_owner: UInt160 = get_contract_owner(contract_script_hash)
+
+    is_owner = runtime.check_witness(get_owner())
+    contract_has_owner = isinstance(contract_owner, UInt160)
+
+    if not is_owner and contract_has_owner:
+        raise Exception('Owner already was set')
+
+    has_ownership = set_ownership(contract_script_hash, owner)
+    
+    if not has_ownership:
+        raise Exception('No authorization')
+    
+    return set_metadata(contract_script_hash, property_name, value) 
+
+@public(name="setMetadata")
+def set_only_metadata(script_hash: UInt160, property_name: str, value: str) -> bool:
     # admin or deployer
     if not runtime.check_witness(get_owner()):
         contract_owner: UInt160 = get_contract_owner(script_hash)
@@ -151,7 +168,11 @@ def set_meta_data(script_hash: UInt160, property_name: str, value: str) -> bool:
             raise Exception('No authorization')
         if not runtime.check_witness(contract_owner):
             raise Exception('No authorization')
+        
+    return set_metadata(script_hash, property_name, value)
 
+
+def set_metadata(script_hash: UInt160, property_name: str, value: str) -> bool:
     assert 0 < len(value) < 390
 
     property_names = get_properties()
@@ -161,15 +182,14 @@ def set_meta_data(script_hash: UInt160, property_name: str, value: str) -> bool:
     if property_names[property_name] is None:
         raise Exception('Undefined property name')
 
-    contract_properties = get_meta_data(script_hash)
+    contract_properties = get_metadata(script_hash)
     contract_properties[property_name] = value
     contract_key = get_contract_property_key(script_hash)
     storage.put(contract_key, StdLib.serialize(contract_properties))
     return True
 
-
-@public(name="getMetaData", safe=True)
-def get_meta_data(script_hash: UInt160) -> dict:
+@public(name="getMetadata", safe=True)
+def get_metadata(script_hash: UInt160) -> dict:
     parent_contract = get_contract_parent(script_hash)
     if isinstance(parent_contract, UInt160):
         contract_key = get_contract_property_key(parent_contract)
@@ -189,11 +209,11 @@ def get_meta_data(script_hash: UInt160) -> dict:
     return contract_properties
 
 
-@public(name="getMultipleMetaData", safe=True)
-def get_multiple_meta_data(contract_hashes: List[UInt160]) -> dict:
+@public(name="getMultipleMetadata", safe=True)
+def get_multiple_metadata(contract_hashes: List[UInt160]) -> dict:
     metadata = {}
     for hash in contract_hashes:
-        contract_metadata = get_meta_data(hash)
+        contract_metadata = get_metadata(hash)
         metadata[hash] = contract_metadata
     return metadata
 
@@ -238,6 +258,7 @@ def get_contract_parent(child_hash: UInt160) -> Optional[UInt160]:
     return None
 
 
+@public(name="getContractOwner", safe=True)
 def get_contract_owner(script_hash: UInt160) -> Optional[UInt160]:
     contract_owner_key = get_contract_owner_key(script_hash)
     storage_result = storage.get(contract_owner_key)
@@ -249,15 +270,15 @@ def get_contract_owner(script_hash: UInt160) -> Optional[UInt160]:
 
 @public(name='setOwnership')
 def set_ownership(script_hash: UInt160, contract_owner: UInt160) -> bool:
-    if can_change_meta_data(script_hash, contract_owner):
+    if can_change_metadata(script_hash, contract_owner):
         contract_owner_key = get_contract_owner_key(script_hash)
         storage.put(contract_owner_key, contract_owner)
         return True
     return False
 
 
-@public(name='canChangeMetaData', safe=True)
-def can_change_meta_data(contract_script_hash: UInt160, contract_owner: UInt160) -> bool:
+@public(name='canChangeMetadata', safe=True)
+def can_change_metadata(contract_script_hash: UInt160, contract_owner: UInt160) -> bool:
     contract: Contract = ContractManagement.get_contract(contract_script_hash)
     if not isinstance(contract, Contract):
         return False

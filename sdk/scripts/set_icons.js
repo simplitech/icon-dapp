@@ -40,7 +40,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
     ))
 
     // Set NEO 25x25 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xef4073a0f2b305a38ec4050e4d3d28bc40ea63f5',
@@ -50,7 +50,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
         NeonParser,
     ))
     // Set NEO 288x288 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xef4073a0f2b305a38ec4050e4d3d28bc40ea63f5',
@@ -61,7 +61,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
     ))
 
     // Set GAS 25x25 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
@@ -71,7 +71,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
         NeonParser,
     ))
     // Set GAS 288x288 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
@@ -82,7 +82,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
     ))
 
     // Set FLM 25x25 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xf0151f528127558851b39c2cd8aa47da7418ab28',
@@ -92,7 +92,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
         NeonParser,
     ))
     // Set FLM 288x288 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xf0151f528127558851b39c2cd8aa47da7418ab28',
@@ -103,7 +103,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
     ))
 
     // Set Burger 25x25 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0x48c40d4666f93408be1bef038b6722404d9a4c2a',
@@ -113,7 +113,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
         NeonParser,
     ))
     // Set Burger 288x288 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0x48c40d4666f93408be1bef038b6722404d9a4c2a',
@@ -124,7 +124,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
     ))
 
     // Set GrantSharesGov 25x25 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9',
@@ -134,7 +134,7 @@ import { NeonParser, NeonInvoker } from '@cityofzion/neon-dappkit'
         NeonParser,
     ))
     // Set GrantSharesGov 288x288 icon
-    invocations.push(sdkApi.setMetaDataAPI(
+    invocations.push(sdkApi.setMetadataAPI(
         scriptHash,
         {
             scriptHash: '0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9',
