@@ -5,7 +5,7 @@
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 2012,
+                "offset": 2124,
                 "parameters": [
                     {
                         "type": "Any",
@@ -95,8 +95,32 @@
                 }
             },
             {
-                "name": "setMetaData",
+                "name": "setMetadata",
                 "offset": 679,
+                "parameters": [
+                    {
+                        "type": "Hash160",
+                        "name": "owner"
+                    },
+                    {
+                        "type": "Hash160",
+                        "name": "contract_script_hash"
+                    },
+                    {
+                        "type": "String",
+                        "name": "property_name"
+                    },
+                    {
+                        "type": "String",
+                        "name": "value"
+                    }
+                ],
+                "safe": false,
+                "returntype": "Boolean"
+            },
+            {
+                "name": "setMetadata",
+                "offset": 782,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -115,8 +139,8 @@
                 "returntype": "Boolean"
             },
             {
-                "name": "getMetaData",
-                "offset": 949,
+                "name": "getMetadata",
+                "offset": 1061,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -133,8 +157,8 @@
                 }
             },
             {
-                "name": "getMultipleMetaData",
-                "offset": 1058,
+                "name": "getMultipleMetadata",
+                "offset": 1170,
                 "parameters": [
                     {
                         "type": "Array",
@@ -155,7 +179,7 @@
             },
             {
                 "name": "setContractParent",
-                "offset": 1102,
+                "offset": 1214,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -171,7 +195,7 @@
             },
             {
                 "name": "getContractParent",
-                "offset": 1364,
+                "offset": 1476,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -183,8 +207,21 @@
                 "returnnullable": true
             },
             {
+                "name": "getContractOwner",
+                "offset": 1568,
+                "parameters": [
+                    {
+                        "type": "Hash160",
+                        "name": "script_hash"
+                    }
+                ],
+                "safe": true,
+                "returntype": "Hash160",
+                "returnnullable": true
+            },
+            {
                 "name": "setOwnership",
-                "offset": 1550,
+                "offset": 1662,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -199,8 +236,8 @@
                 "returntype": "Boolean"
             },
             {
-                "name": "canChangeMetaData",
-                "offset": 1582,
+                "name": "canChangeMetadata",
+                "offset": 1694,
                 "parameters": [
                     {
                         "type": "Hash160",
@@ -216,7 +253,7 @@
             },
             {
                 "name": "listIcons",
-                "offset": 1949,
+                "offset": 2061,
                 "parameters": [],
                 "safe": true,
                 "returntype": "InteropInterface",

@@ -64,7 +64,7 @@ curl --location 'http://seed1.neo.org:10332' \
 }
 ```
 
-## getMetaData
+## getMetadata
 Returns an object with the metadata of the icons of a smart contract. If the smart contract is a child it will return an object with 'parent' as a key.
 
 ### cURL Example (Forthewin)
@@ -75,7 +75,7 @@ curl --location 'http://seed1.neo.org:10332' \
   "method": "invokefunction",
   "params": [
     "0x489e98351485bbd85be99618285932172f1862e4",
-    "getMetaData",
+    "getMetadata",
     [{ "type": "Hash160", "value": "0xf853a98ac55a756ae42379a312d55ddfdf7c8514" }]
   ],  
   "jsonrpc": "2.0",
@@ -135,7 +135,7 @@ curl --location 'http://seed1.neo.org:10332' \
 }
 ```
 
-## getMultipleMetaData
+## getMultipleMetadata
 Returns an object with the metadata of the icons of multiple smart contracts.
 
 ### cURL Example (Forthewin and Tothemoon)
@@ -146,7 +146,7 @@ curl --location 'http://seed1.neo.org:10332' \
   "method": "invokefunction",
   "params": [
     "0x489e98351485bbd85be99618285932172f1862e4",
-    "getMultipleMetaData",
+    "getMultipleMetadata",
     [{
         "type": "Array",
         "value": [
@@ -265,7 +265,7 @@ curl --location 'http://seed1.neo.org:10332' \
 ```
 
 ## getContractParent
-A Dapp is often composed of multiple SmartContracts, so in IconDapp, we group them using the keyword "parent." In short, a Dapp has a single "parent" SmartContract for multiple children. If you require information about a SmartContract's parent, you can utilize the getContractParent method. It's important to note that this method is unnecessary for retrieving an icon associated with a child scripthash; you can still utilize getMetaData for this purpose.
+A Dapp is often composed of multiple SmartContracts, so in IconDapp, we group them using the keyword "parent." In short, a Dapp has a single "parent" SmartContract for multiple children. If you require information about a SmartContract's parent, you can utilize the getContractParent method. It's important to note that this method is unnecessary for retrieving an icon associated with a child scripthash; you can still utilize getMetadata for this purpose.
 
 ### cURL Example (Forthewin)
 ```bash

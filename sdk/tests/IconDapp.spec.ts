@@ -235,18 +235,28 @@ describe('Basic IconDapp Test Suite', function () {
     assert.equal(resp.prop1, 'updated description')
   })
 
-  it('Tests testSetMetaData', async () => {
+  it('Tests testSetMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const iconDapp = await getSdk(owner.account)
-    await assert.rejects(async () => await iconDapp.testSetMetaData({
+    await assert.rejects(async () => await iconDapp.testSetMetadata({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
       propertyName: 'prop1',
       value: 'https://www.google.com/',
     }),
       /Undefined property name/)
+
+    const user = wallets.find((wallet: any) => wallet.name === 'user')
+    const iconDappUser = await getSdk(user.account)
+    await assert.rejects(async () => await iconDappUser.testSetMetadata({
+      owner: user.account.scriptHash,
+      scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
+      propertyName: 'prop1',
+      value: 'https://www.google.com/',
+    }),
+      /No authorization/)  
   })
 
-  it('Tests addProperties and testSetMetaData', async () => {
+  it('Tests addProperties and testSetMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const iconDapp = await getSdk(owner.account)
     await iconDapp.addProperty({
@@ -255,15 +265,33 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    const resp = await iconDapp.testSetMetaData({
+    let resp = await iconDapp.testSetMetadata({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
       propertyName: 'prop1',
       value: 'https://www.google.com/',
     })
     assert.equal(resp, true)
+
+    const user = wallets.find((wallet: any) => wallet.name === 'user')
+    const iconDappUser = await getSdk(user.account)
+    const {stdout} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
+    const contractScriptHash = JSON.parse(stdout)[0].hash
+    resp = await iconDappUser.testSetMetadata(
+      {
+        owner: user.account.scriptHash,
+        scriptHash: contractScriptHash,
+        propertyName: 'prop1',
+        value: 'https://www.google.com/',
+      },
+      [
+        { account: user.account.scriptHash, scopes: "Global" },
+        { account: contractScriptHash, scopes: "Global" }
+      ]
+    )
+    assert.equal(resp, true)
   })
 
-  it('Tests addProperties, setMetaData and getMetaData', async () => {
+  it('Tests addProperties, setMetadata and getMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const iconDapp = await getSdk(owner.account)
     await iconDapp.addProperty({
@@ -272,7 +300,7 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    const txid = await iconDapp.setMetaData({
+    const txid = await iconDapp.setMetadata({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
       propertyName: 'prop1',
       value: 'https://www.google.com/',
@@ -280,20 +308,101 @@ describe('Basic IconDapp Test Suite', function () {
     assert(txid.length > 0)
     await wait(1200)
 
-    const resp = await iconDapp.getMetaData({
+    const resp = await iconDapp.getMetadata({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
     })
 
     assert.equal(resp.prop1, 'https://www.google.com/')
+
+    const user = wallets.find((wallet: any) => wallet.name === 'user')
+    const iconDappUser = await getSdk(user.account)
+    const {stdout} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
+    const contractScriptHash = JSON.parse(stdout)[0].hash
+    const txid2 = await iconDappUser.setMetadata(
+      {
+        owner: user.account.scriptHash,
+        scriptHash: contractScriptHash,
+        propertyName: 'prop1',
+        value: 'https://www.youtube.com/',
+      },
+      [
+        { account: user.account.scriptHash, scopes: "Global" },
+        { account: contractScriptHash, scopes: "Global" }
+      ]
+    )
+    assert(txid2.length > 0)
+    await wait(1200)
+
+    const resp2 = await iconDapp.getMetadata({
+      scriptHash: contractScriptHash,
+    })
+
+    assert.equal(resp2.prop1, 'https://www.youtube.com/')
+
+    await assert.rejects(async () => await iconDappUser.setMetadata(
+      {
+        owner: user.account.scriptHash,
+        scriptHash: contractScriptHash,
+        propertyName: 'prop1',
+        value: 'https://www.youtube.com/',
+      },
+      [
+        { account: user.account.scriptHash, scopes: "Global" },
+        { account: contractScriptHash, scopes: "Global" }
+      ]
+    ),
+      /Owner already was set/)    
   })
 
-  it('Tests setMetaData invalid length',
+  it('Tests changing contract ownership of a contract that already has ownership when setting metadata', async () => {
+    const owner = wallets.find((wallet: any) => wallet.name === 'owner')
+
+    const iconDapp = await getSdk(owner.account)
+    await iconDapp.addProperty({
+      propertyName: 'prop1',
+      description: 'description1',
+    })
+    await wait(1200)
+
+    const user = wallets.find((wallet: any) => wallet.name === 'user')
+    const iconDappUser = await getSdk(user.account)
+    const {stdout} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
+    const contractScriptHash = JSON.parse(stdout)[0].hash
+
+    await iconDappUser.setOwnership({
+      scriptHash: contractScriptHash,
+      contractOwner: user.account.scriptHash,
+    }, [
+      { account: user.account.scriptHash, scopes: "Global" },
+      { account: contractScriptHash, scopes: "Global" }
+    ])
+    await wait(1200)
+
+    const firstOwner = await iconDapp.getContractOwner({scriptHash: contractScriptHash})
+    assert.equal(firstOwner.slice(2), user.account.scriptHash)
+
+    const otherUser = wallets.find((wallet: any) => wallet.name === 'otherUser')
+    await iconDapp.setMetadata(
+      {
+        owner: otherUser.account.scriptHash,
+        scriptHash: contractScriptHash,
+        propertyName: 'prop1',
+        value: 'https://www.youtube.com/',
+      }
+    )
+    await wait(1200)
+
+    const secondOwner = await iconDapp.getContractOwner({scriptHash: contractScriptHash})
+    assert.equal(secondOwner.slice(2), otherUser.account.scriptHash)
+  })
+
+  it('Tests setMetadata invalid length',
   async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const iconDapp = await getSdk(owner.account)
     
     await assert.rejects( 
-      async() => await iconDapp.setMetaData({
+      async() => await iconDapp.setMetadata({
         scriptHash: '0x1234567890123456789012345678901234567890',
         propertyName: 'icon/25x25',
         value: 'a'.repeat(390),
@@ -303,7 +412,7 @@ describe('Basic IconDapp Test Suite', function () {
     )
     
     await assert.rejects( 
-      async() => await iconDapp.setMetaData({
+      async() => await iconDapp.setMetadata({
         scriptHash: '0x1234567890123456789012345678901234567890',
         propertyName: 'icon/25x25',
         value: '',
@@ -313,7 +422,7 @@ describe('Basic IconDapp Test Suite', function () {
     )
   })
 
-  it('Tests getMultipleMetaData', async () => {
+  it('Tests getMultipleMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const iconDapp = await getSdk(owner.account)
     await iconDapp.addProperty({
@@ -322,12 +431,12 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    const txid1 = await iconDapp.setMetaData({
+    const txid1 = await iconDapp.setMetadata({
       scriptHash: '0x14d91cd393bc06c571b966df1cc59c0115bdb59c',
       propertyName: 'prop1',
       value: 'https://www.google.com/',
     })
-    const txid2 = await iconDapp.setMetaData({
+    const txid2 = await iconDapp.setMetadata({
       scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
       propertyName: 'prop1',
       value: 'https://www.reddit.com/',
@@ -336,7 +445,7 @@ describe('Basic IconDapp Test Suite', function () {
     assert(txid2.length > 0)
     await wait(1200)
 
-    const resp: any = await iconDapp.getMultipleMetaData({
+    const resp: any = await iconDapp.getMultipleMetadata({
       contractHashes: ['0x14d91cd393bc06c571b966df1cc59c0115bdb59c', '0xd2a4cff31913016155e38e474a2c06d08be276cf']
     })
 
@@ -406,7 +515,7 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    const resp = await iconDappForUser.testSetMetaData({
+    const resp = await iconDappForUser.testSetMetadata({
       scriptHash: hash,
       propertyName: 'prop1',
       value: 'https://www.google.com/',
@@ -433,7 +542,7 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     await assert.rejects( 
-      async () => await iconDappUser.setMetaData({
+      async () => await iconDappUser.setMetadata({
         scriptHash: contractScriptHash,
         propertyName,
         value
@@ -444,7 +553,7 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     // making sure no value was saved
-    let contractMetadata = await iconDappUser.getMetaData({scriptHash: contractScriptHash})
+    let contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
     assert(contractMetadata[propertyName] === undefined, 'Property value should not have been added')
     
     // user is claiming ownership of the smart contract they deployed
@@ -456,14 +565,14 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     // user can change their smart contract's metadata now
-    await iconDappUser.setMetaData({
+    await iconDappUser.setMetadata({
       scriptHash: contractScriptHash,
       propertyName,
       value
     })
     await wait(1200)
 
-    contractMetadata = await iconDappUser.getMetaData({scriptHash: contractScriptHash})
+    contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
     assert(contractMetadata[propertyName] === value, 'Property value should have been added')
   })
 
@@ -485,7 +594,7 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     await assert.rejects( 
-      async () => await iconDappUser.setMetaData({
+      async () => await iconDappUser.setMetadata({
         scriptHash: contractScriptHash,
         propertyName,
         value
@@ -496,7 +605,7 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     // making sure no value was saved
-    let contractMetadata = await iconDappUser.getMetaData({scriptHash: contractScriptHash})
+    let contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
     assert(contractMetadata[propertyName] === undefined, 'Property value should not have been added')
     
     // user is claiming ownership of the smart contract without adding the contract as a signer
@@ -526,7 +635,7 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     // user can change their smart contract's metadata now
-    const txId = await iconDappUser.setMetaData({
+    const txId = await iconDappUser.setMetadata({
       scriptHash: contractScriptHash,
       propertyName,
       value
@@ -538,17 +647,17 @@ describe('Basic IconDapp Test Suite', function () {
     const txReturn = applicationLog.executions[0]?.stack?.[0].value
 
     assert(txReturn === true)
-    contractMetadata = await iconDappUser.getMetaData({scriptHash: contractScriptHash})
+    contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
     assert(contractMetadata[propertyName] === value, 'Property value should have been added')
 
     const otherUser = wallets.find((wallet: any) => wallet.name === 'otherUser')
     const iconDappOtherUser = await getSdk(otherUser.account)
 
-    const canNotChangeMetaData = await iconDappOtherUser.canChangeMetaData({
+    const canNotChangeMetadata = await iconDappOtherUser.canChangeMetadata({
       contractScriptHash: contractScriptHash,
       contractOwner: otherUser.account.scriptHash,
     })
-    assert(canNotChangeMetaData === false)
+    assert(canNotChangeMetadata === false)
   })
 
 
@@ -585,7 +694,7 @@ describe('Basic IconDapp Test Suite', function () {
     )
   })
 
-  it('Tests owner canChangeMetaData', async () => {
+  it('Tests owner canChangeMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
     const user = wallets.find((wallet: any) => wallet.name === 'user')
     const iconDappOwner = await getSdk(owner.account)
@@ -594,14 +703,14 @@ describe('Basic IconDapp Test Suite', function () {
     const contractScriptHash = JSON.parse(stdout)[0].hash
 
     // owner is checking if they can change ownership of the smart contract
-    const userCanChangeOwnership = await iconDappOwner.canChangeMetaData({
+    const userCanChangeOwnership = await iconDappOwner.canChangeMetadata({
       contractScriptHash,
       contractOwner: user.account.scriptHash,
     })
     assert(userCanChangeOwnership)
   })
 
-  it('Tests canChangeMetaData with verify method', async () => {
+  it('Tests canChangeMetadata with verify method', async () => {
     const user = wallets.find((wallet: any) => wallet.name === 'user')
     const iconDappUser = await getSdk(user.account)
 
@@ -609,14 +718,14 @@ describe('Basic IconDapp Test Suite', function () {
     const contractScriptHash = JSON.parse(stdout)[0].hash
 
     // user is checking if they can change ownership of the smart contract without adding the contract as a signer
-    const userCanChangeOwnershipNoSigner = await iconDappUser.canChangeMetaData({
+    const userCanChangeOwnershipNoSigner = await iconDappUser.canChangeMetadata({
       contractScriptHash,
       contractOwner: user.account.scriptHash,
     })
     assert(userCanChangeOwnershipNoSigner === false )
 
     // user is checking if they can change ownership of the smart contract
-    const userCanChangeOwnership = await iconDappUser.canChangeMetaData(
+    const userCanChangeOwnership = await iconDappUser.canChangeMetadata(
       {
         contractScriptHash,
         contractOwner: user.account.scriptHash,
@@ -652,7 +761,7 @@ describe('Basic IconDapp Test Suite', function () {
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0x48c40d4666f93408be1bef038b6722404d9a4c2a"), true)
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9"), true)
   
-    const txid = await iconDapp.setMetaData({
+    const txid = await iconDapp.setMetadata({
       scriptHash: '0x1234567890123456789012345678901234567890',
       propertyName: 'icon/25x25',
       value: 'https://www.google.com/',
@@ -686,7 +795,7 @@ describe('Basic IconDapp Test Suite', function () {
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0x48c40d4666f93408be1bef038b6722404d9a4c2a"), true)
     assert.strictEqual(icons.some(icon => icon.scriptHash==="0xf15976ea5c020aaa12b9989aa9880e990eb5dcc9"), true)
 
-    const txid = await iconDapp.setMetaData({
+    const txid = await iconDapp.setMetadata({
       scriptHash: '0x1234567890123456789012345678901234567890',
       propertyName: 'icon/25x25',
       value: 'https://www.google.com/',

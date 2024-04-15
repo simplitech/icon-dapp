@@ -70,32 +70,36 @@ export function getPropertiesAPI(scriptHash: string): ContractInvocation {
 	}
 }
 
-export function setMetaDataAPI(scriptHash: string, params: { scriptHash: string, propertyName: string, value: string }, parser: Neo3Parser ): ContractInvocation {
+export function setMetadataAPI(scriptHash: string, params: { scriptHash: string, propertyName: string, value: string, owner?: string }, parser: Neo3Parser ): ContractInvocation {
 	if (params.value.length >= 390 || params.value.length <= 0){
 		throw new Error('Length of value is incorrect, it should be between 1 and 389');
 	}
 	
 	return {
 		scriptHash,
-		operation: 'setMetaData',
-		args: [parser.formatRpcArgument(params.scriptHash, { type: 'Hash160' }),parser.formatRpcArgument(params.propertyName, { type: 'String' }),parser.formatRpcArgument(params.value, { type: 'String' }),
+		operation: 'setMetadata',
+		args: [
+			...(params.owner ? [parser.formatRpcArgument(params.owner, { type: 'Hash160' })] : []),
+			parser.formatRpcArgument(params.scriptHash, { type: 'Hash160' }),
+			parser.formatRpcArgument(params.propertyName, { type: 'String' }),
+			parser.formatRpcArgument(params.value, { type: 'String' }),
 		],
 	}
 }
 
-export function getMetaDataAPI(scriptHash: string, params: { scriptHash: string }, parser: Neo3Parser ): ContractInvocation {
+export function getMetadataAPI(scriptHash: string, params: { scriptHash: string }, parser: Neo3Parser ): ContractInvocation {
 	return {
 		scriptHash,
-		operation: 'getMetaData',
+		operation: 'getMetadata',
 		args: [parser.formatRpcArgument(params.scriptHash, { type: 'Hash160' }),
 		],
 	}
 }
 
-export function getMultipleMetaDataAPI(scriptHash: string, params: { contractHashes: any[] }, parser: Neo3Parser ): ContractInvocation {
+export function getMultipleMetadataAPI(scriptHash: string, params: { contractHashes: any[] }, parser: Neo3Parser ): ContractInvocation {
 	return {
 		scriptHash,
-		operation: 'getMultipleMetaData',
+		operation: 'getMultipleMetadata',
 		args: [parser.formatRpcArgument(params.contractHashes, { type: 'Array', generic: { type: 'Hash160' } }),
 		],
 	}
@@ -119,6 +123,15 @@ export function getContractParentAPI(scriptHash: string, params: { childHash: st
 	}
 }
 
+export function getContractOwnerAPI(scriptHash: string, params: { scriptHash: string }, parser: Neo3Parser ): ContractInvocation {
+	return {
+		scriptHash,
+		operation: 'getContractOwner',
+		args: [parser.formatRpcArgument(params.scriptHash, { type: 'Hash160' }),
+		],
+	}
+}
+
 export function setOwnershipAPI(scriptHash: string, params: { scriptHash: string, contractOwner: string }, parser: Neo3Parser ): ContractInvocation {
 	return {
 		scriptHash,
@@ -128,10 +141,10 @@ export function setOwnershipAPI(scriptHash: string, params: { scriptHash: string
 	}
 }
 
-export function canChangeMetaDataAPI(scriptHash: string, params: { contractScriptHash: string, contractOwner: string }, parser: Neo3Parser ): ContractInvocation {
+export function canChangeMetadataAPI(scriptHash: string, params: { contractScriptHash: string, contractOwner: string }, parser: Neo3Parser ): ContractInvocation {
 	return {
 		scriptHash,
-		operation: 'canChangeMetaData',
+		operation: 'canChangeMetadata',
 		args: [parser.formatRpcArgument(params.contractScriptHash, { type: 'Hash160' }),parser.formatRpcArgument(params.contractOwner, { type: 'Hash160' }),
 		],
 	}
