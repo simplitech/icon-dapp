@@ -5,7 +5,7 @@
         "methods": [
             {
                 "name": "_deploy",
-                "offset": 2124,
+                "offset": 1939,
                 "parameters": [
                     {
                         "type": "Any",
@@ -237,15 +237,11 @@
             },
             {
                 "name": "canChangeMetadata",
-                "offset": 1694,
+                "offset": 1693,
                 "parameters": [
                     {
                         "type": "Hash160",
                         "name": "contract_script_hash"
-                    },
-                    {
-                        "type": "Hash160",
-                        "name": "contract_owner"
                     }
                 ],
                 "safe": true,
@@ -253,7 +249,7 @@
             },
             {
                 "name": "listIcons",
-                "offset": 2061,
+                "offset": 1876,
                 "parameters": [],
                 "safe": true,
                 "returntype": "InteropInterface",
@@ -276,13 +272,6 @@
             "methods": [
                 "deserialize",
                 "serialize"
-            ]
-        },
-        {
-            "contract": "0x726cb6e0cd8628a1350a611384688911ab75f51b",
-            "methods": [
-                "sha256",
-                "ripemd160"
             ]
         }
     ],

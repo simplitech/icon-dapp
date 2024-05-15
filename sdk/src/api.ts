@@ -141,11 +141,11 @@ export function setOwnershipAPI(scriptHash: string, params: { scriptHash: string
 	}
 }
 
-export function canChangeMetadataAPI(scriptHash: string, params: { contractScriptHash: string, contractOwner: string }, parser: Neo3Parser ): ContractInvocation {
+export function canChangeMetadataAPI(scriptHash: string, params: { contractScriptHash: string }, parser: Neo3Parser ): ContractInvocation {
 	return {
 		scriptHash,
 		operation: 'canChangeMetadata',
-		args: [parser.formatRpcArgument(params.contractScriptHash, { type: 'Hash160' }),parser.formatRpcArgument(params.contractOwner, { type: 'Hash160' }),
+		args: [parser.formatRpcArgument(params.contractScriptHash, { type: 'Hash160' }),
 		],
 	}
 }
