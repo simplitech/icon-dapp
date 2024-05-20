@@ -505,14 +505,22 @@ describe('Basic IconDapp Test Suite', function () {
     })
     await wait(1200)
 
-    const {stdout} = await exec(`neoxp contract get "Ownership" -i ${neoXpInstancePath}`)
-
+    const {stdout} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
     const {hash} = JSON.parse(stdout)[0]
 
     await iconDappForUser.setOwnership({
       scriptHash: hash,
       contractOwner: user.account.scriptHash,
-    })
+    }, [
+      {
+        scopes: 'CalledByEntry',
+        account: user.account.scriptHash
+      },
+      {
+        scopes: 'CalledByEntry',
+        account: hash
+      },
+    ])
     await wait(1200)
 
     const resp = await iconDappForUser.testSetMetadata({
@@ -533,7 +541,7 @@ describe('Basic IconDapp Test Suite', function () {
     const value = 'https://www.google.com'
 
     const {stdout} = await exec(`neoxp contract get "ownership" -i ${neoXpInstancePath}`)
-    const contractScriptHash = JSON.parse(stdout)[0].hash
+    const notverifiableScriptHash = JSON.parse(stdout)[0].hash
 
     await iconDappOwner.addProperty({
       propertyName,
@@ -543,7 +551,7 @@ describe('Basic IconDapp Test Suite', function () {
 
     await assert.rejects( 
       async () => await iconDappUser.setMetadata({
-        scriptHash: contractScriptHash,
+        scriptHash: notverifiableScriptHash,
         propertyName,
         value
       }),
@@ -553,26 +561,50 @@ describe('Basic IconDapp Test Suite', function () {
     await wait(1200)
 
     // making sure no value was saved
-    let contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
+    let contractMetadata = await iconDappUser.getMetadata({scriptHash: notverifiableScriptHash})
     assert(contractMetadata[propertyName] === undefined, 'Property value should not have been added')
     
-    // user is claiming ownership of the smart contract they deployed
-    const txid = await iconDappUser.setOwnership({
-      scriptHash: contractScriptHash,
+    // user is claiming ownership of the smart contract they deployed, 
+    // but it won't work, because the contract is not verifiable 
+    const txid1 = await iconDappUser.setOwnership({
+      scriptHash: notverifiableScriptHash,
       contractOwner: userOwner.account.scriptHash,
     })
-    assert(txid.length > 0)
+    assert(txid1.length > 0)
+    await wait(1200)
+
+    const result = await neoEventListener.waitForApplicationLog(txid1)
+    assert(result.executions[0].stack && result.executions[0].stack[0].value === false)
+
+    const {stdout: stdout2} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
+    const verifiableScriptHash = JSON.parse(stdout2)[0].hash
+
+    // user is claiming ownership of the smart contract they can verify
+    const txid2 = await iconDappUser.setOwnership({
+      scriptHash: verifiableScriptHash,
+      contractOwner: userOwner.account.scriptHash,
+    }, [
+      {
+        scopes: 'CalledByEntry',
+        account: userOwner.account.scriptHash
+      },
+      {
+        scopes: 'CalledByEntry',
+        account: verifiableScriptHash
+      },
+    ])
+    assert(txid2.length > 0)
     await wait(1200)
 
     // user can change their smart contract's metadata now
     await iconDappUser.setMetadata({
-      scriptHash: contractScriptHash,
+      scriptHash: verifiableScriptHash,
       propertyName,
       value
     })
     await wait(1200)
 
-    contractMetadata = await iconDappUser.getMetadata({scriptHash: contractScriptHash})
+    contractMetadata = await iconDappUser.getMetadata({scriptHash: verifiableScriptHash})
     assert(contractMetadata[propertyName] === value, 'Property value should have been added')
   })
 
@@ -655,7 +687,6 @@ describe('Basic IconDapp Test Suite', function () {
 
     const canNotChangeMetadata = await iconDappOtherUser.canChangeMetadata({
       contractScriptHash: contractScriptHash,
-      contractOwner: otherUser.account.scriptHash,
     })
     assert(canNotChangeMetadata === false)
   })
@@ -696,7 +727,6 @@ describe('Basic IconDapp Test Suite', function () {
 
   it('Tests owner canChangeMetadata', async () => {
     const owner = wallets.find((wallet: any) => wallet.name === 'owner')
-    const user = wallets.find((wallet: any) => wallet.name === 'user')
     const iconDappOwner = await getSdk(owner.account)
 
     const {stdout} = await exec(`neoxp contract get "verifiable" -i ${neoXpInstancePath}`)
@@ -705,7 +735,6 @@ describe('Basic IconDapp Test Suite', function () {
     // owner is checking if they can change ownership of the smart contract
     const userCanChangeOwnership = await iconDappOwner.canChangeMetadata({
       contractScriptHash,
-      contractOwner: user.account.scriptHash,
     })
     assert(userCanChangeOwnership)
   })
@@ -720,7 +749,6 @@ describe('Basic IconDapp Test Suite', function () {
     // user is checking if they can change ownership of the smart contract without adding the contract as a signer
     const userCanChangeOwnershipNoSigner = await iconDappUser.canChangeMetadata({
       contractScriptHash,
-      contractOwner: user.account.scriptHash,
     })
     assert(userCanChangeOwnershipNoSigner === false )
 
@@ -728,7 +756,6 @@ describe('Basic IconDapp Test Suite', function () {
     const userCanChangeOwnership = await iconDappUser.canChangeMetadata(
       {
         contractScriptHash,
-        contractOwner: user.account.scriptHash,
       },
       [
         {

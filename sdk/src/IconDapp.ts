@@ -295,7 +295,7 @@ export class IconDapp{
 		return this.config.parser.parseRpcResponse(res.stack[0], { type: 'Boolean' })
 	}
 
-	async canChangeMetadata(params: { contractScriptHash: string, contractOwner: string }, signers: Signer[] = []): Promise<boolean>{
+	async canChangeMetadata(params: { contractScriptHash: string }, signers: Signer[] = []): Promise<boolean>{
 		const res = await this.config.invoker.testInvoke({
 			invocations: [Invocation.canChangeMetadataAPI(this.config.scriptHash, params, this.config.parser)],
 			signers,

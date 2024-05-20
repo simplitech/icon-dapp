@@ -270,7 +270,7 @@ def get_contract_owner(script_hash: UInt160) -> Optional[UInt160]:
 
 @public(name='setOwnership')
 def set_ownership(script_hash: UInt160, contract_owner: UInt160) -> bool:
-    if can_change_metadata(script_hash, contract_owner):
+    if can_change_metadata(script_hash):
         contract_owner_key = get_contract_owner_key(script_hash)
         storage.put(contract_owner_key, contract_owner)
         return True
@@ -278,7 +278,7 @@ def set_ownership(script_hash: UInt160, contract_owner: UInt160) -> bool:
 
 
 @public(name='canChangeMetadata', safe=True)
-def can_change_metadata(contract_script_hash: UInt160, contract_owner: UInt160) -> bool:
+def can_change_metadata(contract_script_hash: UInt160) -> bool:
     contract: Contract = ContractManagement.get_contract(contract_script_hash)
     if not isinstance(contract, Contract):
         return False
@@ -293,6 +293,7 @@ def can_change_metadata(contract_script_hash: UInt160, contract_owner: UInt160) 
         if method.name == 'verify':
             has_verify = True
             break
+
     if has_verify:
         if runtime.check_witness(contract_script_hash):
             return True
@@ -304,38 +305,7 @@ def can_change_metadata(contract_script_hash: UInt160, contract_owner: UInt160) 
         if runtime.check_witness(current_contract_owner):
             return True
 
-    # check if the contract was deployed by the given address
-    computed_script_hash: bytes = _compute_contract_hash(contract_owner, contract)
-    if computed_script_hash == contract_script_hash:
-        return True
-
     return False
-
-def _compute_contract_hash(sender: UInt160, contract: Contract) -> bytes:
-    # there's a bug with calling contract.nef[:4] directly
-    nef_check_sum = contract.nef
-    nef_check_sum = nef_check_sum[-4:]
-
-    # there's a bug with calling contract.manifest.name directly
-    manifest: ContractManifest = contract.manifest
-    contract_name = helper.to_bytes(manifest.name)
-
-    contract_name_size = len(contract_name)
-    if contract_name_size < 0x100:
-        serialized_name = b'\x0c' + helper.to_bytes(contract_name_size)   # PUSHDATA1
-    elif contract_name_size < 0x10000:
-        serialized_name = b'\x0d' + helper.to_bytes(contract_name_size)   # PUSHDATA2
-    else:
-        serialized_name = b'\x0e' + \
-            helper.to_bytes(contract_name_size)[:4]  # PUSHDATA4
-
-    validation_script = (b'\x38' +                      # ABORT
-                         b'\x0c\x14' + sender +         # PUSHDATA1 + 20 bytes
-                         b'\x02' + nef_check_sum +      # PUSHINT32
-                         serialized_name + contract_name)
-
-    return CryptoLib.ripemd160(CryptoLib.sha256(validation_script))
-
 
 @public(name="listIcons", safe=True)
 def list_icons() -> Iterator:
