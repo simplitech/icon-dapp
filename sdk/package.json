@@ -1,6 +1,6 @@
 {
   "name": "@simpli/icondapp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "The IconDapp SDK lets you get icons from smart contracts on the Neo blockchain.",
   "main": "dist/index",
   "types": "dist/index",
